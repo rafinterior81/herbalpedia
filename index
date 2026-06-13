@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Herbalpedia</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{--g1:#1eb927;--g2:#146b09;--g3:#059610;--gl:#e8f8ea;--gl2:#f3fcf4;--gs:#c5eecc;--wh:#fff;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;--g400:#9ca3af;--g500:#6b7280;--g700:#374151;--gold:#b8860b;--goldl:#fdf6e3;--goldd:#8a6508;--th:#0d4a06;--tb:#1a3a14;--r:16px;--r2:20px;--nav-h:72px;--pad-bot:96px}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#e5e7eb;color:var(--tb);overflow:hidden;height:100vh;height:100dvh;display:flex;justify-content:center;align-items:center}
+
+.A{width:100%;max-width:430px;height:100vh;height:100dvh;max-height:932px;background:var(--wh);position:relative;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.12)}
+
+.S{position:absolute;top:0;left:0;width:100%;height:100%;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;transform:translateY(10px);-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+.S.show{opacity:1;pointer-events:auto;transform:translateY(0)}
+.S::-webkit-scrollbar{width:3px}
+.S::-webkit-scrollbar-track{background:transparent}
+.S::-webkit-scrollbar-thumb{background:var(--gs);border-radius:3px}
+.S.has-nav{padding-bottom:var(--pad-bot)}
+.S.no-nav{padding-bottom:24px}
+
+.NV{position:absolute;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--wh);border-top:1px solid var(--g200);display:flex;align-items:center;justify-content:space-around;padding:0 4px 12px;z-index:50}
+.NB{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px 12px;border-radius:12px;border:none;background:none;color:var(--g400);font-family:inherit;position:relative;transition:color .2s}
+.NB i{font-size:20px}.NB span{font-size:10px;font-weight:600}
+.NB.on{color:var(--g2)}.NB.on::before{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:22px;height:3px;background:var(--g1);border-radius:0 0 3px 3px}
+
+.POP{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,.55);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s;padding:20px}
+.POP.on{opacity:1;pointer-events:auto}
+.POP .PBOX{width:100%;max-width:380px;max-height:85vh;background:var(--wh);border-radius:var(--r2);overflow:hidden;transform:scale(.88) translateY(20px);transition:transform .35s cubic-bezier(.16,1,.3,1);box-shadow:0 25px 80px rgba(0,0,0,.25);display:flex;flex-direction:column}
+.POP.on .PBOX{transform:scale(1) translateY(0)}
+.POP .PBOX .PHD{padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.POP .PBOX .PHD h3{font-size:17px;font-weight:800;color:var(--g2)}
+.POP .PBOX .PHD button{width:34px;height:34px;border-radius:10px;background:var(--gl);border:none;color:var(--g2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:transform .15s;flex-shrink:0}
+.POP .PBOX .PHD button:active{transform:scale(.88)}
+.POP .PBOX .PBD{padding:16px 20px 24px;overflow-y:auto;overflow-x:hidden;flex:1;min-height:0;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+.POP .PBOX .PBD::-webkit-scrollbar{width:3px}
+.POP .PBOX .PBD::-webkit-scrollbar-track{background:transparent}
+.POP .PBOX .PBD::-webkit-scrollbar-thumb{background:var(--gs);border-radius:3px}
+
+.POP.ADM .PBOX{max-height:90vh}
+
+.HH{padding:14px 20px 0;display:flex;align-items:center;justify-content:space-between}
+.HH .LO{display:flex;align-items:center;gap:10px}
+.HH .LO img{width:36px;height:36px;border-radius:10px;object-fit:cover}
+.HH .LO b{font-size:18px;font-weight:900;color:var(--g2);letter-spacing:-.5px}
+.HH .AC{display:flex;gap:8px}
+.IB{width:40px;height:40px;border-radius:12px;background:var(--gl);border:none;color:var(--g2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;position:relative;transition:transform .15s}
+.IB:active{transform:scale(.9)}
+.IB .BD{position:absolute;top:6px;right:6px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:2px solid var(--wh)}
+.SR{margin:14px 20px;position:relative}
+.SR input{width:100%;height:50px;border-radius:14px;border:2px solid var(--gs);background:var(--gl2);padding:0 48px 0 44px;font-size:14px;font-family:inherit;font-weight:500;color:var(--tb);outline:none;transition:all .25s}
+.SR input::placeholder{color:var(--gs)}.SR input:focus{border-color:var(--g1);background:var(--wh);box-shadow:0 4px 20px rgba(30,185,39,.25)}
+.SR .SI{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--g3);font-size:16px;pointer-events:none}
+.SR .SF{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:10px;background:var(--g1);border:none;color:var(--wh);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}
+.HR{margin:4px 20px 0;border-radius:var(--r);overflow:hidden;position:relative;height:180px;background:linear-gradient(135deg,var(--g3),var(--g1))}
+.HR>img{width:100%;height:100%;object-fit:cover;opacity:.25;display:block}
+.HR .HC{position:absolute;inset:0;padding:24px;display:flex;flex-direction:column;justify-content:center}
+.HR .badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.25);backdrop-filter:blur(10px);padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;color:var(--wh);text-transform:uppercase;letter-spacing:.5px;width:fit-content;margin-bottom:10px}
+.HR .HC h2{font-size:20px;font-weight:900;color:var(--wh);line-height:1.3;margin-bottom:6px}
+.HR .HC p{font-size:12px;color:rgba(255,255,255,.9);line-height:1.5;max-width:230px}
+.SH{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px}
+.SH h3{font-size:16px;font-weight:800;color:var(--th)}
+.SH .SA{font-size:12px;font-weight:700;color:var(--g2);cursor:pointer;border:none;background:none;display:flex;align-items:center;gap:4px;font-family:inherit}
+.CG4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 20px}
+.CI4{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:10px 2px 8px;border-radius:12px;background:var(--gl2);border:1px solid var(--gs);transition:all .15s}
+.CI4:active{transform:scale(.92);background:var(--gl)}
+.CI4 .ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.CI4 span{font-size:9px;font-weight:600;color:var(--tb);text-align:center;line-height:1.2}
+.STB{display:flex;gap:1px;padding:16px 20px;margin:4px 20px;background:var(--gl);border-radius:var(--r);border:1px solid var(--gs)}
+.STB>div{flex:1;text-align:center}
+.STB .num{font-size:20px;font-weight:900;color:var(--g2)}
+.STB .lbl{font-size:9px;font-weight:600;color:var(--g3);text-transform:uppercase;margin-top:2px}
+.PS{display:flex;gap:14px;padding:0 20px 4px;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.PS::-webkit-scrollbar{display:none}
+.PC{flex-shrink:0;width:155px;background:var(--wh);border-radius:var(--r);overflow:hidden;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06);border:1px solid var(--g100);transition:transform .15s}
+.PC:active{transform:scale(.96)}
+.PC .PW{overflow:hidden;position:relative;height:120px}
+.PC .PW img{width:100%;height:100%;object-fit:cover;display:block}
+.PC .FV{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--g400);border:none;cursor:pointer}
+.PC .FV.lk{color:#ef4444}
+.PC .PB{padding:10px 12px 14px}
+.PC .PT{font-size:9px;font-weight:700;color:var(--g2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+.PC .PN{font-size:13px;font-weight:700;color:var(--th);margin-bottom:2px}
+.PC .PL{font-size:10px;font-style:italic;color:var(--g400)}
+.TS{margin:0 20px;padding:20px;background:linear-gradient(135deg,var(--g2),var(--g3));border-radius:var(--r);position:relative;overflow:hidden}
+.TS::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.05)}
+.TS .TH{display:flex;align-items:center;gap:10px;margin-bottom:16px;position:relative;z-index:1}
+.TS .TI{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px}
+.TS .TT{font-size:16px;font-weight:800;color:var(--wh)}
+.TS .TSub{font-size:11px;color:rgba(255,255,255,.7)}
+.TC{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+.TCI{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.1);border-radius:14px;padding:12px 14px;cursor:pointer;border:1px solid rgba(255,255,255,.1);transition:transform .15s}
+.TCI:active{transform:scale(.97)}
+.TCI img{width:50px;height:50px;border-radius:12px;object-fit:cover;flex-shrink:0}
+.TCI .TN{font-size:13px;font-weight:700;color:var(--wh);margin-bottom:2px}
+.TCI .TD{font-size:10px;color:rgba(255,255,255,.7)}
+.TPC{margin:0 20px 12px;padding:16px;background:var(--wh);border-radius:var(--r);border:1px solid var(--g100);box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;gap:14px;align-items:center;cursor:pointer;transition:transform .15s}
+.TPC:active{transform:scale(.98)}
+.TPC .TIC{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.TPC .TTX{flex:1}
+.TPC .TT2{font-size:13px;font-weight:700;color:var(--th);margin-bottom:3px}
+.TPC .TTE{font-size:11px;color:var(--g500);line-height:1.4}
+
+.HD{padding:20px;background:var(--gl);border-bottom:2px solid var(--gs);position:relative}
+.HD h2{font-size:22px;font-weight:900;color:var(--g2);margin-bottom:4px}
+.HD p{font-size:12px;color:var(--g3)}
+.HD-adm{padding:16px 20px;background:var(--gl);border-bottom:2px solid var(--gs);display:flex;align-items:center;gap:14px;flex-shrink:0}
+.HD-adm .BKB{margin-bottom:0}
+.HD-adm .HDT{flex:1}
+.HD-adm h2{font-size:18px;font-weight:900;color:var(--g2);margin-bottom:2px}
+.HD-adm p{font-size:11px;color:var(--g3)}
+.BKB{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--g2);cursor:pointer;border:none;background:none;font-family:inherit;padding:0;transition:opacity .15s}
+.BKB:active{opacity:.6}
+
+.CG2{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 20px}
+.CG2I{background:var(--wh);border-radius:var(--r);padding:20px 16px;text-align:center;cursor:pointer;border:1px solid var(--g100);box-shadow:0 1px 3px rgba(0,0,0,.06);transition:transform .15s;position:relative;overflow:hidden}
+.CG2I:active{transform:scale(.95)}
+.CG2I .ce{font-size:32px;margin-bottom:10px;display:block}
+.CG2I .cv{font-size:13px;font-weight:700;color:var(--th);margin-bottom:3px}
+.CG2I .cx{font-size:10px;color:var(--g400)}
+.LI{display:flex;gap:14px;align-items:center;padding:14px;background:var(--wh);border-radius:var(--r);margin:0 20px 10px;border:1px solid var(--g100);cursor:pointer;transition:transform .15s}
+.LI:active{transform:scale(.98)}
+.LI img{width:60px;height:60px;border-radius:14px;object-fit:cover;flex-shrink:0}
+.LI .LNF{flex:1;min-width:0}
+.LI .LN{font-size:14px;font-weight:700;color:var(--th)}
+.LI .LL{font-size:11px;font-style:italic;color:var(--g400)}
+.LI .LC{font-size:9px;font-weight:700;color:var(--g2);text-transform:uppercase;margin-top:4px;display:inline-block}
+
+.TNP-intro{margin:16px 20px;padding:20px;background:linear-gradient(135deg,var(--g2),var(--g3));border-radius:var(--r);color:var(--wh);position:relative;overflow:hidden}
+.TNP-intro::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06)}
+.TNP-intro h3{font-size:18px;font-weight:800;margin-bottom:6px;position:relative;z-index:1}
+.TNP-intro p{font-size:12px;opacity:.85;line-height:1.5;position:relative;z-index:1}
+.TNP-card{margin:0 20px 12px;padding:16px;background:var(--wh);border-radius:var(--r);border:1px solid var(--g100);display:flex;gap:14px;cursor:pointer;transition:transform .15s}
+.TNP-card:active{transform:scale(.98)}
+.TNP-card img{width:80px;height:80px;border-radius:14px;object-fit:cover;flex-shrink:0}
+.TNP-card .TNC-info{flex:1;min-width:0}
+.TNP-card .TNC-name{font-size:15px;font-weight:800;color:var(--th);margin-bottom:2px}
+.TNP-card .TNC-latin{font-size:11px;font-style:italic;color:var(--g400);margin-bottom:6px}
+.TNP-card .TNC-ben{font-size:11px;color:var(--g500);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.TNP-card .TNC-had{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 10px;border-radius:20px;background:var(--goldl);color:var(--goldd);font-size:9px;font-weight:700}
+
+.PFH{text-align:center;padding:30px 20px 20px;background:var(--gl);border-bottom:2px solid var(--gs)}
+.PFH .pav{width:72px;height:72px;border-radius:50%;background:var(--g1);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--wh);border:3px solid var(--gs)}
+.PFH h3{font-size:18px;font-weight:800;color:var(--g2)}
+.PFH p{font-size:12px;color:var(--g3)}
+.PST{display:flex;gap:1px;margin:0 20px;background:var(--g100);border-radius:var(--r);overflow:hidden;margin-top:-16px;position:relative;z-index:2;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.PST>div{flex:1;text-align:center;padding:16px 8px;background:var(--wh)}
+.PST .pv{font-size:18px;font-weight:900;color:var(--g2)}
+.PST .pk{font-size:9px;font-weight:600;color:var(--g3);text-transform:uppercase;margin-top:2px}
+.PM{padding:20px}
+.PMI{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--g100);cursor:pointer;transition:opacity .15s}
+.PMI:last-child{border-bottom:none}
+.PMI:active{opacity:.6}
+.PMI .mic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.PMI .mtx{flex:1}
+.PMI .mn{font-size:14px;font-weight:600;color:var(--th)}
+.PMI .md{font-size:11px;color:var(--g400)}
+
+/* ===== DETAIL PAGE (FULL PAGE) ===== */
+.DET-PAGE{position:relative;width:100%;background:var(--wh)}
+.DET-HERO{position:relative;height:280px;overflow:hidden;background:linear-gradient(135deg,var(--g2),var(--g1))}
+.DET-HERO img{width:100%;height:100%;object-fit:cover;display:block;opacity:.9}
+.DET-HERO .DET-GRAD{position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(0,0,0,.7))}
+.DET-HERO .DET-BACK{position:absolute;top:16px;left:16px;width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;font-size:16px;color:var(--g2);z-index:2;transition:transform .15s}
+.DET-HERO .DET-BACK:active{transform:scale(.9)}
+.DET-HERO .DET-SHARE{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;font-size:16px;color:var(--g2);z-index:2}
+.DET-HERO .DET-INFO{position:absolute;bottom:0;left:0;right:0;padding:20px;z-index:1}
+.DET-HERO .DET-BADGE{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:10px}
+.DET-HERO .DET-NAME{font-size:26px;font-weight:900;color:var(--wh);text-shadow:0 2px 8px rgba(0,0,0,.3);margin-bottom:4px}
+.DET-HERO .DET-LATIN{font-size:14px;font-style:italic;color:rgba(255,255,255,.85)}
+.DET-BODY{padding:20px}
+.DET-INFO-GRID{display:flex;gap:10px;margin-bottom:24px}
+.DET-INFO-GRID>div{flex:1;padding:14px;border-radius:14px;background:var(--gl);border:1px solid var(--gs);text-align:center}
+.DET-INFO-GRID .dil{font-size:10px;font-weight:700;color:var(--g2);text-transform:uppercase;margin-bottom:4px}
+.DET-INFO-GRID .div2{font-size:13px;font-weight:700;color:var(--th)}
+.DET-SEC{margin-bottom:24px}
+.DET-SEC h4{font-size:16px;font-weight:800;color:var(--th);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.DET-SEC h4 i{color:var(--g1);font-size:14px}
+.DET-SEC p{font-size:13px;color:var(--tb);line-height:1.8}
+.DET-BENEFITS{display:flex;flex-direction:column;gap:8px}
+.DET-BENEFITS>div{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--gl);border-radius:12px;border:1px solid var(--gs)}
+.DET-BENEFITS i{color:var(--g1);font-size:12px}
+.DET-BENEFITS span{font-size:12px;font-weight:600;color:var(--tb)}
+.DET-HADITH{padding:16px;background:var(--goldl);border-radius:14px;border-left:4px solid var(--gold);margin-bottom:10px}
+.DET-HADITH .dhl{font-size:10px;font-weight:800;color:var(--goldd);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.DET-HADITH .dha{font-family:'Amiri',serif;font-size:14px;color:var(--tb);line-height:1.8;direction:rtl;text-align:right;margin-bottom:8px}
+.DET-HADITH .dhtr{font-size:12px;color:var(--g500);line-height:1.6;font-style:italic}
+.DET-HADITH .dhs{font-size:10px;font-weight:700;color:var(--goldd);margin-top:8px}
+.DET-RECIPE{padding:16px;border-radius:14px;border:1px solid var(--g200)}
+.DET-RECIPE .drt2{font-size:14px;font-weight:700;color:var(--th);margin-bottom:12px}
+.DET-RECIPE .drst{display:flex;flex-direction:column;gap:8px}
+.DET-RECIPE .drst>div{display:flex;gap:10px}
+.DET-RECIPE .smn{width:24px;height:24px;border-radius:50%;background:var(--g1);color:var(--wh);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.DET-RECIPE .smt{font-size:12px;color:var(--tb);line-height:1.5;padding-top:2px}
+.DET-FAV-BTN{width:100%;padding:18px;border-radius:14px;font-size:15px;font-weight:700;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,background .3s;margin-top:24px;margin-bottom:24px}
+.DET-FAV-BTN:active{transform:scale(.97)}
+.DET-FAV-BTN.add{background:linear-gradient(135deg,var(--g2),var(--g1));color:var(--wh);box-shadow:0 4px 20px rgba(30,185,39,.3)}
+.DET-FAV-BTN.saved{background:var(--g100);color:var(--g500);box-shadow:none}
+
+.ADMH{padding:20px;background:linear-gradient(135deg,var(--g2),var(--g1));color:var(--wh)}
+.ADMH h2{font-size:20px;font-weight:900;margin-bottom:4px}
+.ADMH p{font-size:12px;opacity:.8}
+.ADST{display:flex;gap:8px;padding:16px 20px;margin-top:-12px;position:relative;z-index:2}
+.ADST>div{flex:1;background:var(--wh);border-radius:14px;padding:14px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.ADST .av{font-size:20px;font-weight:900;color:var(--g2)}
+.ADST .al{font-size:9px;font-weight:600;color:var(--g3);text-transform:uppercase;margin-top:2px}
+.ADMM{padding:0 20px}
+.ADMI{display:flex;align-items:center;gap:14px;padding:14px;background:var(--wh);border-radius:14px;margin-bottom:10px;border:1px solid var(--g100);cursor:pointer;transition:transform .15s}
+.ADMI:active{transform:scale(.98)}
+.ADMI .aic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ADMI .atx{flex:1}.ADMI .anm{font-size:14px;font-weight:700;color:var(--th)}.ADMI .ade{font-size:11px;color:var(--g400)}
+.ACR{padding:0 20px 20px}
+.ACRH{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
+.ACRH h3{font-size:16px;font-weight:800;color:var(--th)}
+.ABT{padding:8px 16px;border-radius:10px;background:var(--g1);color:var(--wh);font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:transform .15s}
+.ABT:active{transform:scale(.95)}
+.ARW{display:flex;align-items:center;gap:12px;padding:12px;background:var(--wh);border-radius:12px;margin-bottom:8px;border:1px solid var(--g100)}
+.ARW img{width:48px;height:48px;border-radius:10px;object-fit:cover;flex-shrink:0}
+.ARW .ainf{flex:1;min-width:0}.ARW .anm{font-size:13px;font-weight:700;color:var(--th);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ARW .asl{font-size:10px;color:var(--g400)}
+.ARW .aac{display:flex;gap:6px;flex-shrink:0}
+.EBT{width:32px;height:32px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:transform .15s}
+.EBT:active{transform:scale(.9)}
+.EBT.ed{background:var(--gl);color:var(--g2)}.EBT.de{background:#fef2f2;color:#ef4444}
+.AFG{margin-bottom:14px}
+.AFG label{display:block;font-size:11px;font-weight:700;color:var(--g400);text-transform:uppercase;margin-bottom:6px}
+.AFG input,.AFG textarea,.AFG select{width:100%;height:44px;border-radius:10px;border:2px solid var(--gs);padding:0 14px;font-size:13px;font-family:inherit;outline:none;transition:border-color .2s;background:var(--wh);color:var(--tb)}
+.AFG input:focus,.AFG textarea:focus,.AFG select:focus{border-color:var(--g1)}
+.AFG textarea{height:80px;padding:10px 14px;resize:vertical}
+.AFG select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.AFG .fpv{width:100%;height:120px;border-radius:10px;object-fit:cover;margin-top:8px;border:1px solid var(--gs);display:block}
+.AFBT{display:flex;gap:10px;margin-top:16px}
+.AFBT button{flex:1;height:48px;border-radius:12px;font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:inherit}
+.AFBT .svb{background:var(--g1);color:var(--wh)}.AFBT .cnb{background:var(--g100);color:var(--g500)}
+.CFMB{padding:28px 24px;text-align:center}
+.CFMB i{font-size:40px;color:#ef4444;margin-bottom:14px;display:block}
+.CFMB h3{font-size:17px;font-weight:800;color:var(--th);margin-bottom:8px}
+.CFMB p{font-size:13px;color:var(--g500);line-height:1.5;margin-bottom:20px}
+.CFMB .cfb{display:flex;gap:10px}
+.CFMB .cfb button{flex:1;height:46px;border-radius:12px;font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:inherit}
+.CFMB .cfy{background:#ef4444;color:var(--wh)}.CFMB .cfn{background:var(--g100);color:var(--g500)}
+.SRI{display:flex;gap:14px;align-items:center;padding:12px;margin:0 20px 10px;background:var(--wh);border-radius:var(--r);border:1px solid var(--g100);cursor:pointer;transition:transform .15s}
+.SRI:active{transform:scale(.98)}
+.SRI img{width:64px;height:64px;border-radius:14px;object-fit:cover;flex-shrink:0}
+.SRI .sri{flex:1}.SRI .srn{font-size:14px;font-weight:700;color:var(--th)}.SRI .srl{font-size:11px;font-style:italic;color:var(--g400)}.SRI .srt{display:inline-block;margin-top:4px;font-size:9px;font-weight:700;color:var(--g2);text-transform:uppercase}
+.ARC{margin:0 20px 14px;padding:16px;background:var(--wh);border-radius:var(--r);border:1px solid var(--g100);cursor:pointer;transition:transform .15s}
+.ARC:active{transform:scale(.98)}
+.ARC img{width:100%;height:160px;object-fit:cover;border-radius:12px;margin-bottom:12px;display:block}
+.ARC .atg{font-size:9px;font-weight:700;color:var(--g2);text-transform:uppercase;margin-bottom:6px}
+.ARC .att{font-size:15px;font-weight:700;color:var(--th);line-height:1.4;margin-bottom:6px}
+.ARC .atx{font-size:12px;color:var(--g500);line-height:1.5}
+.ARC .atm{display:flex;gap:12px;margin-top:10px;font-size:10px;color:var(--g400)}
+.RMC{margin:0 20px 14px;padding:18px;background:var(--wh);border-radius:var(--r);border:1px solid var(--g100)}
+.RMC .rhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.RMC .rnm{font-size:14px;font-weight:700;color:var(--th)}
+.RMC .rtg{width:48px;height:26px;border-radius:13px;background:var(--g200);border:none;cursor:pointer;position:relative;transition:all .3s}
+.RMC .rtg.on{background:var(--g1)}
+.RMC .rtg::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--wh);box-shadow:0 1px 3px rgba(0,0,0,.1);transition:all .3s}
+.RMC .rtg.on::after{left:25px}
+.RMC .rtm2{font-size:28px;font-weight:900;color:var(--g2);margin-bottom:4px}
+.RMC .rlb{font-size:11px;color:var(--g400)}
+.RMC .rhb{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.RMC .rhb>span{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;background:var(--gl);color:var(--g2)}
+.EMP{text-align:center;padding:60px 20px}
+.EMP i{font-size:48px;color:var(--gs);display:block;margin-bottom:16px}
+.EMP h3{font-size:16px;font-weight:700;color:var(--g2);margin-bottom:6px}
+.EMP p{font-size:13px;color:var(--g400);line-height:1.5}
+.SYNC{margin:16px 20px;padding:16px;background:var(--wh);border-radius:var(--r);border:1px solid var(--g100)}
+.SYNC h4{font-size:13px;font-weight:700;color:var(--th);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.SYNC .SYI{margin-bottom:10px}
+.SYNC .SYI label{display:block;font-size:10px;font-weight:700;color:var(--g400);text-transform:uppercase;margin-bottom:4px}
+.SYNC .SYI input{width:100%;height:40px;border-radius:10px;border:2px solid var(--gs);padding:0 12px;font-size:12px;font-family:inherit;outline:none}
+.SYNC .SYI input:focus{border-color:var(--g1)}
+.SYNC .SYB{display:flex;gap:8px}
+.SYNC .SYB button{flex:1;height:40px;border-radius:10px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit;transition:transform .15s}
+.SYNC .SYB button:active{transform:scale(.95)}
+.SYNC .SYB .syp{background:var(--g1);color:var(--wh)}
+.SYNC .SYB .syg{background:var(--goldl);color:var(--goldd)}
+.SYNC .SYS{font-size:11px;color:var(--g400);margin-top:8px;display:flex;align-items:center;gap:6px}
+.SYNC .SYS .SYD{width:8px;height:8px;border-radius:50%;background:var(--g400)}
+.SYNC .SYS .SYD.on{background:var(--g1)}
+.SYNC .SYS .SYD.err{background:#ef4444}
+.TST{position:absolute;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--g2);color:var(--wh);padding:12px 24px;border-radius:12px;font-size:13px;font-weight:600;font-family:inherit;z-index:500;opacity:0;pointer-events:none;transition:all .3s;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.TST.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="A" id="app">
+
+<div class="S has-nav show" id="pg-home">
+  <header class="HH"><div class="LO"><img src="https://z-cdn-media.chatglm.cn/files/116abcc9-b758-4b78-985e-e736453012a3.png?auth_key=1881316527-3c6f83512dd84cf3960312bc074f4c1b-0-a5e0d5d35fefa9df80bb5a66e6e099a6" alt="Logo"><b>Herbalpedia</b></div><div class="AC"><button class="IB" id="notifBtn"><i class="fa-solid fa-bell"></i><span class="BD"></span></button><button class="IB" id="profBtn"><i class="fa-solid fa-user"></i></button></div></header>
+  <div class="SR"><i class="fa-solid fa-magnifying-glass SI"></i><input type="text" placeholder="Cari tanaman obat, herbal..." id="sinp"><button class="SF" id="filtBtn"><i class="fa-solid fa-sliders"></i></button></div>
+  <div id="homeC">
+    <div class="HR"><img id="heroImg" src="https://z-cdn-media.chatglm.cn/files/d2219b20-cd77-4efb-91f4-405dd66c5616.png?auth_key=1881316527-6da3ea6469d14fbeac319359e2b0b99e-0-75a9d998ef1a6547e20069ff2a5aaafb" alt="Herbal"><div class="HC"><div class="badge"><i class="fa-solid fa-leaf"></i> Rekomendasi</div><h2 id="heroTi">Kehidupan Sehat dengan Herbal Alami</h2><p id="heroSu">Temukan khasiat tanaman obat dan pengobatan ala Nabi SAW</p></div></div>
+    <div class="SH"><h3>Kategori</h3><button class="SA" id="seeCat">Lihat Semua <i class="fa-solid fa-chevron-right"></i></button></div>
+    <div class="CG4" id="qCats"></div>
+    <div class="STB"><div><div class="num" id="st1">0</div><div class="lbl">Tanaman</div></div><div><div class="num" id="st2">0</div><div class="lbl">Tibbun</div></div><div><div class="num" id="st3">0</div><div class="lbl">Resep</div></div><div><div class="num" id="st4">0</div><div class="lbl">Hadis</div></div></div>
+    <div class="SH"><h3>Tanaman Obat Populer</h3><button class="SA" id="seePop">Lihat Semua <i class="fa-solid fa-chevron-right"></i></button></div>
+    <div class="PS" id="popP"></div>
+    <div class="SH"><h3>Tibbun Nabawi</h3><button class="SA" id="seeTib">Selengkapnya <i class="fa-solid fa-chevron-right"></i></button></div>
+    <div class="TS"><div class="TH"><div class="TI"><i class="fa-solid fa-mosque"></i></div><div><div class="TT">Obat Ala Nabi SAW</div><div class="TSub">Berdasarkan Al-Quran dan Hadis Sahih</div></div></div><div class="TC" id="tibC"></div></div>
+    <div class="SH"><h3>Tips Kesehatan Herbal</h3></div>
+    <div id="tipL"></div>
+  </div>
+  <div id="srR" style="display:none"></div>
+</div>
+
+<div class="S has-nav" id="pg-categories"><div class="HD" id="catHd"><h2>Kategori Herbal</h2><p>Jelajahi berbagai kategori tanaman obat</p></div><div class="CG2" id="catG"></div><div class="SH"><h3 id="cpT">Semua Tanaman</h3></div><div id="apL"></div></div>
+
+<div class="S has-nav" id="pg-tibbun"><div class="HD" style="background:linear-gradient(135deg,var(--g2),var(--g3));color:var(--wh)"><h2 style="color:var(--wh)"><i class="fa-solid fa-mosque" style="margin-right:8px"></i>Tibbun Nabawi</h2><p style="color:rgba(255,255,255,.8)">Pengobatan berdasarkan Al-Quran dan Hadis Sahih</p></div><div class="TNP-intro"><h3><i class="fa-solid fa-star-and-crescent" style="margin-right:6px"></i>Pengobatan Ala Nabi SAW</h3><p>Tibbun Nabawi adalah ilmu pengobatan yang didasarkan pada hadis-hadis Nabi Muhammad SAW tentang kesehatan dan pengobatan.</p></div><div id="tibList"></div></div>
+
+<div class="S has-nav" id="pg-articles"><div class="HD"><h2>Artikel Kesehatan</h2><p>Wawasan seputar herbal dan Tibbun Nabawi</p></div><div id="artL" style="padding-top:16px"></div></div>
+
+<!-- DETAIL PLANT - FULL PAGE -->
+<div class="S no-nav" id="pg-detail"></div>
+
+<!-- DETAIL ARTIKEL - FULL PAGE -->
+<div class="S no-nav" id="pg-artdet"></div>
+
+<div class="S has-nav" id="pg-favorites"><div class="HD"><h2>Favorit Saya</h2><p>Koleksi tanaman obat yang Anda simpan</p></div><div id="favC"></div></div>
+<div class="S has-nav" id="pg-history"><div class="HD"><h2>Riwayat Pembacaan</h2><p>Tanaman yang baru Anda baca</p></div><div id="hisL"></div></div>
+<div class="S has-nav" id="pg-reminders"><div class="HD"><h2>Pengingat Minum Jamu</h2><p>Atur jadwal pengingat harian</p></div><div id="remL" style="padding-top:16px"></div><div style="padding:16px 20px 20px"><button style="width:100%;padding:16px;border-radius:14px;background:var(--g1);color:var(--wh);font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px" id="addRemBtn"><i class="fa-solid fa-plus"></i> Tambah Pengingat</button></div></div>
+<div class="S has-nav" id="pg-about"><div class="HD"><h2>Tentang Herbalpedia</h2><p>Informasi aplikasi</p></div><div id="abC" style="padding:30px 20px"></div></div>
+<div class="S has-nav" id="pg-share"><div class="HD"><h2>Bagikan Aplikasi</h2><p>Ajak teman hidup sehat</p></div><div id="shC" style="padding:30px 20px"></div></div>
+<div class="S has-nav" id="pg-profile"><div class="PFH"><div class="pav"><i class="fa-solid fa-user"></i></div><h3>Pengguna Herbalpedia</h3><p>Pencinta herbal alami</p></div><div class="PST"><div><div class="pv" id="pFav">0</div><div class="pk">Favorit</div></div><div><div class="pv" id="pRead">0</div><div class="pk">Dibaca</div></div><div><div class="pv">7</div><div class="pk">Hari</div></div></div><div class="PM" id="pmM"></div></div>
+
+<!-- NOTIFIKASI - FULL PAGE -->
+<div class="S no-nav" id="pg-notif"><div class="HD"><h2><i class="fa-solid fa-bell"></i> Notifikasi</h2><button class="BKB" onclick="go('home')" style="position:absolute;top:20px;right:20px"><i class="fa-solid fa-arrow-left"></i></button></div><div id="notifContent" style="padding:16px 20px"></div></div>
+
+<!-- FILTER - FULL PAGE -->
+<div class="S no-nav" id="pg-filter"><div class="HD"><h2><i class="fa-solid fa-sliders"></i> Filter Kategori</h2><button class="BKB" onclick="go('home')" style="position:absolute;top:20px;right:20px"><i class="fa-solid fa-arrow-left"></i></button></div><div id="filterContent" style="padding:16px 20px"></div></div>
+
+<!-- LOGIN - FULL PAGE -->
+<div class="S no-nav" id="pg-login"><div class="HD"><h2><i class="fa-solid fa-lock"></i> Login Admin</h2><button class="BKB" onclick="go('profile')" style="position:absolute;top:20px;right:20px"><i class="fa-solid fa-arrow-left"></i></button></div><div id="loginContent" style="padding:20px"></div></div>
+
+<div class="S no-nav" id="pg-admin"><div class="ADMH"><h2><i class="fa-solid fa-shield-halved" style="margin-right:8px"></i>Dashboard Admin</h2><p>Kelola semua data aplikasi</p></div><div class="ADST" id="adSt"></div><div class="ADMM" id="adMm"></div><div class="SYNC" id="syncSec"></div></div>
+<div class="S no-nav" id="pg-ad-plants"><div class="HD-adm"><button class="BKB" onclick="go('admin')"><i class="fa-solid fa-arrow-left"></i></button><div class="HDT"><h2>Kelola Tanaman</h2><p>Tambah, edit, atau hapus data tanaman</p></div></div><div class="ACR" id="aplC"></div></div>
+<div class="S no-nav" id="pg-ad-cats"><div class="HD-adm"><button class="BKB" onclick="go('admin')"><i class="fa-solid fa-arrow-left"></i></button><div class="HDT"><h2>Kelola Kategori</h2><p>Tambah, edit, atau hapus kategori</p></div></div><div class="ACR" id="aclC"></div></div>
+<div class="S no-nav" id="pg-ad-articles"><div class="HD-adm"><button class="BKB" onclick="go('admin')"><i class="fa-solid fa-arrow-left"></i></button><div class="HDT"><h2>Kelola Artikel</h2><p>Tambah, edit, atau hapus artikel</p></div></div><div class="ACR" id="aalC"></div></div>
+<div class="S no-nav" id="pg-ad-hero"><div class="HD-adm"><button class="BKB" onclick="go('admin')"><i class="fa-solid fa-arrow-left"></i></button><div class="HDT"><h2>Ganti Hero Image</h2><p>Ubah gambar dan teks banner</p></div></div><div class="ACR" id="ahlC"></div></div>
+
+<nav class="NV" id="mainNav"><button class="NB on" data-pg="home"><i class="fa-solid fa-house"></i><span>Beranda</span></button><button class="NB" data-pg="categories"><i class="fa-solid fa-th-large"></i><span>Kategori</span></button><button class="NB" data-pg="tibbun"><i class="fa-solid fa-mosque"></i><span>Tibbun</span></button><button class="NB" data-pg="profile"><i class="fa-solid fa-user"></i><span>Profil</span></button></nav>
+
+<!-- Popup hanya untuk form dan konfirmasi -->
+<div class="POP ADM" id="popForm"><div class="PBOX" id="formBx"></div></div>
+<div class="POP" id="popConf"><div class="PBOX" style="max-width:320px" id="confBx"></div></div>
+<div class="TST" id="tst"></div>
+</div>
+
+<script>
+var DEF={settings:{gasUrl:''},cats:[{id:'rematik',name:'Rematik & Sendi',icon:'fa-solid fa-bone',color:'#1eb927'},{id:'pencernaan',name:'Pencernaan',icon:'fa-solid fa-pills',color:'#059610'},{id:'pernapasan',name:'Pernapasan',icon:'fa-solid fa-lungs',color:'#146b09'},{id:'kulit',name:'Kulit & Luka',icon:'fa-solid fa-hand-dots',color:'#1eb927'},{id:'diabetes',name:'Diabetes',icon:'fa-solid fa-droplet',color:'#059610'},{id:'demam',name:'Demam & Flu',icon:'fa-solid fa-temperature-high',color:'#146b09'},{id:'jantung',name:'Jantung & Darah',icon:'fa-solid fa-heart-pulse',color:'#1eb927'},{id:'tibbun',name:'Tibbun Nabawi',icon:'fa-solid fa-mosque',color:'#b8860b'},{id:'wanita',name:'Kesehatan Wanita',icon:'fa-solid fa-venus',color:'#059610'},{id:'syaraf',name:'Saraf & Stres',icon:'fa-solid fa-brain',color:'#146b09'}],plants:[{id:1,name:'Habbatus Sauda',latin:'Nigella sativa',category:'tibbun',img:'https://picsum.photos/seed/habbatus/400/300.jpg',family:'Ranunculaceae',partUsed:'Biji',method:'Dikonsumsi langsung / diminyak',description:'Habbatus Sauda atau Jintan Hitam merupakan salah satu tanaman obat yang paling direkomendasikan dalam Tibbun Nabawi. Rasulullah SAW bersabda bahwa ia adalah obat untuk segala penyakit kecuali kematian.',benefits:['Menguatkan sistem imun','Mengobati gangguan pernapasan','Antiinflamasi alami','Menurunkan gula darah','Menjaga kesehatan jantung','Mengatasi masalah pencernaan'],hadith:{arab:'عَلَيْكُمْ بِهَذِهِ الْحَبَّةِ السَّوْدَاءِ فَإِنَّ فِيهَا شِفَاءً مِنْ كُلِّ دَاءٍ إِلَّا السَّامَ',translation:'Gunakanlah habbatus sauda ini, karena di dalamnya terdapat obat dari segala penyakit kecuali kematian.',source:'HR. Bukhari & Muslim'},recipe:{title:'Ramuan Habbatus Sauda',steps:['Ambil 1 sendok teh minyak habbatus sauda','Campurkan dengan 1 sendok makan madu murni','Tambahkan setengah gelas air hangat','Aduk rata dan minum pada pagi hari sebelum sarapan']}},{id:2,name:'Madu',latin:'Apis mellifera (produksi)',category:'tibbun',img:'https://picsum.photos/seed/honey-herb/400/300.jpg',family:'Apidae (produk lebah)',partUsed:'Cairan madu',method:'Dikonsumsi langsung / dicampur',description:'Madu adalah cairan manis yang dihasilkan lebah. Al-Quran menyebut madu sebagai obat yang menyembuhkan bagi manusia.',benefits:['Antibakteri alami','Mempercepat penyembuhan luka','Meredakan batuk dan sakit tenggorokan','Meningkatkan energi','Menjaga kesehatan pencernaan','Antioksidan kuat'],hadith:{arab:'عَلَيْكُمْ بِالشِّفَاءَيْنِ الْعَسَلِ وَالْقُرْآنِ',translation:'Pergunakanlah dua obat penyembuh: madu dan Al-Quran.',source:'HR. Ibnu Majah'},recipe:{title:'Minuman Madu Penyembuh',steps:['Siapkan 2 sendok makan madu murni','Campur dengan segelas air hangat','Tambahkan perasan setengah buah lemon','Minum setiap pagi sebelum makan']}},{id:3,name:'Kurma',latin:'Phoenix dactylifera',category:'tibbun',img:'https://picsum.photos/seed/dates-fruit/400/300.jpg',family:'Arecaceae',partUsed:'Buah',method:'Dikonsumsi langsung',description:'Kurma sangat dianjurkan dalam Islam, terutama untuk berbuka puasa.',benefits:['Sumber energi instan','Membantu persalinan','Menguatkan tulang','Mencegah anemia','Menjaga kesehatan jantung','Meningkatkan kesuburan'],hadith:{arab:'إِذَا أَفْطَرَ أَحَدُكُمْ فَلْيُفْطِرْ عَلَى تَمْرٍ',translation:'Jika salah seorang di antara kalian berbuka puasa, maka berbukalah dengan kurma.',source:'HR. Abu Dawud'},recipe:{title:'Kurma Susu Penyegar',steps:['Siapkan 7 butir kurma ajwa','Buang biji dan blender dengan segelas susu','Tambahkan sedikit madu jika perlu','Minum saat berbuka puasa atau sahur']}},{id:4,name:'Jahe',latin:'Zingiber officinale',category:'pencernaan',img:'https://picsum.photos/seed/ginger-root/400/300.jpg',family:'Zingiberaceae',partUsed:'Rimpang',method:'Direbus / dimakan langsung',description:'Jahe disebut Al-Quran sebagai minuman penghuni surga.',benefits:['Mengatasi mual dan muntah','Meredakan nyeri sendi','Menurunkan gula darah','Mempercepat pencernaan','Menghangatkan tubuh','Mengobati batuk dan pilek'],hadith:{arab:'وَيُسْقَوْنَ فِيهَا كَأْسًا كَانَ مِزَاجُهَا زَنجَبِيلًا',translation:'Dan mereka diberi minum gelas yang campurannya adalah jahe.',source:'QS. Al-Insan: 17'},recipe:{title:'Wedang Jahe Hangat',steps:['Kupas dan geprek 3 ruas jahe segar','Rebus dengan 3 gelas air selama 10 menit','Tambahkan 2 sendok makan madu','Saring dan minum selagi hangat']}},{id:5,name:'Kunyit',latin:'Curcuma longa',category:'kulit',img:'https://picsum.photos/seed/turmeric-root/400/300.jpg',family:'Zingiberaceae',partUsed:'Rimpang',method:'Ditumbuk / direbus',description:'Kunyit mengandung curcumin, senyawa antiinflamasi dan antioksidan kuat.',benefits:['Antiinflamasi kuat','Menjaga kesehatan hati','Mencerahkan kulit','Mengurangi nyeri artritis','Membantu pencernaan','Menurunkan kolesterol'],hadith:null,recipe:{title:'Jamu Kunyit Asam',steps:['Parut 100g kunyit segar, peras airnya','Campur dengan air perasan 2 buah asam jawa','Tambahkan madu secukupnya','Aduk rata dan sajikan']}},{id:6,name:'Zaitun',latin:'Olea europaea',category:'tibbun',img:'https://picsum.photos/seed/olive-herb/400/300.jpg',family:'Oleaceae',partUsed:'Buah & Minyak',method:'Dimakan langsung / minyak dioles',description:'Zaitun disebut dalam Al-Quran sebagai pohon yang diberkahi.',benefits:['Menurunkan kolesterol jahat','Melindungi jantung','Melembapkan kulit','Antioksidan kuat','Mencegah stroke','Membantu penurunan berat badan'],hadith:{arab:'كُلُوا الزَّيْتَ وَادَّهِنُوا بِهِ فَإِنَّهُ مِنْ شَجَرَةٍ مُبَارَكَةٍ',translation:'Makanlah minyak zaitun dan berminyaklah dengannya.',source:'HR. Tirmidzi & Ibnu Majah'},recipe:{title:'Minuman Zaitun Pagi',steps:['Siapkan 1 sdm minyak zaitun extra virgin','Campur dengan sedikit perasan lemon','Minum setiap pagi sebelum sarapan','Dilanjutkan dengan segelas air hangat']}},{id:7,name:'Mint',latin:'Mentha spicata',category:'pernapasan',img:'https://picsum.photos/seed/mint-leaf/400/300.jpg',family:'Lamiaceae',partUsed:'Daun',method:'Direbus / dikunyah',description:'Daun mint memberikan kesegaran dan membantu sistem pernapasan.',benefits:['Meredakan sesak napas','Mengatasi masalah pencernaan','Menghilangkan bau mulut','Meredakan sakit kepala','Menurunkan demam','Mengatasi mual'],hadith:null,recipe:{title:'Teh Mint Segar',steps:['Siapkan 10 lembar daun mint segar','Seduh dengan air panas 5 menit','Tambahkan madu sesuai selera','Minum hangat atau dingin']}},{id:8,name:'Daun Sirih',latin:'Piper betle',category:'kulit',img:'https://picsum.photos/seed/betel-leaf/400/300.jpg',family:'Piperaceae',partUsed:'Daun',method:'Dikunyah / direndam',description:'Daun sirih adalah antiseptik alami dalam tradisi Nusantara.',benefits:['Antiseptik alami','Mengobati luka','Mengatasi bau mulut','Meredakan batuk','Mengobati jamur kulit','Menghentikan pendarahan minor'],hadith:null,recipe:{title:'Air Rendaman Sirih',steps:['Cuci 5 lembar daun sirih segar','Rendam dalam segelas air panas','Diamkan hingga berwarna kecokelatan','Gunakan untuk berkumur atau bersihkan luka']}},{id:9,name:'Bawang Putih',latin:'Allium sativum',category:'jantung',img:'https://picsum.photos/seed/garlic-herb/400/300.jpg',family:'Amaryllidaceae',partUsed:'Umbi',method:'Dikonsumsi langsung / dimasak',description:'Bawang putih mengandung allicin untuk kesehatan kardiovaskular.',benefits:['Menurunkan tekanan darah','Menurunkan kolesterol','Antibakteri alami','Menguatkan imun','Mencegah penggumpalan darah','Antioksidan kuat'],hadith:null,recipe:{title:'Madu Bawang Putih',steps:['Kupas dan tumbuk 3 siung bawang putih','Rendam dalam 3 sdm madu','Diamkan semalaman','Konsumsi 1 sdt setiap pagi']}},{id:10,name:'Kayu Manis',latin:'Cinnamomum verum',category:'diabetes',img:'https://picsum.photos/seed/cinnamon-stick/400/300.jpg',family:'Lauraceae',partUsed:'Kulit batang',method:'Direbus / ditabur',description:'Kayu manis menurunkan gula darah dan antimikroba.',benefits:['Menurunkan gula darah','Antiinflamasi','Menghangatkan tubuh','Memperlancar pencernaan','Menurunkan kolesterol','Antimikroba alami'],hadith:null,recipe:{title:'Teh Kayu Manis',steps:['Siapkan 1 batang kayu manis','Rebus dalam 2 gelas air 10 menit','Tambahkan madu dan lemon','Minum 1-2 kali sehari']}},{id:11,name:'Aloe Vera',latin:'Aloe barbadensis',category:'kulit',img:'https://picsum.photos/seed/aloe-vera/400/300.jpg',family:'Asphodelaceae',partUsed:'Gel daun',method:'Dioles / diminum',description:'Lidah buaya untuk perawatan kulit dan kesehatan.',benefits:['Melembapkan kulit','Mempercepat penyembuhan luka bakar','Menutrisi rambut','Meredakan heartburn','Antiinflamasi','Detoksifikasi alami'],hadith:null,recipe:{title:'Jus Aloe Vera',steps:['Ambil gel lidah buaya segar','Blender dengan air dan madu','Tambahkan perasan jeruk nipis','Minum segar di pagi hari']}},{id:12,name:'Sereh',latin:'Cymbopogon citratus',category:'demam',img:'https://picsum.photos/seed/lemongrass/400/300.jpg',family:'Poaceae',partUsed:'Batang & daun',method:'Direbus / diseduh',description:'Sereh antibakteri dan antiinflamasi alami.',benefits:['Menurunkan demam','Antibakteri alami','Merelaksasi tubuh','Mengatasi pencernaan','Mengusir serangga','Mengurangi stres'],hadith:null,recipe:{title:'Wedang Sereh Jahe',steps:['Geprek 2 batang sereh segar','Iris tipis 2 ruas jahe','Rebus dengan 3 gelas air 10 menit','Tambahkan madu, minum hangat']}}],articles:[{id:1,title:'Panduan Lengkap Hidup Sehat dengan Herbal',tag:'Panduan',img:'https://picsum.photos/seed/herbal-guide/600/300.jpg',excerpt:'Langkah praktis memulai gaya hidup herbalis sesuai sunnah Nabi SAW.',date:'12 Juni 2026',readTime:'8 menit',content:'<p>Hidup sehat dengan herbal bukan sekadar tren, melainkan warisan kebijaksanaan ribuan tahun. Dalam Islam, pengobatan dengan tanaman obat dikenal sebagai Tibbun Nabawi.</p><h2>Langkah Pertama</h2><p>Mulailah dengan tanaman obat yang mudah didapat. Habbatus sauda, madu, jahe, dan kurma adalah empat pilar utama.</p><h2>Konsistensi adalah Kunci</h2><p>Herbal bekerja secara holistik dan bertahap. Sabar dan istiqamah adalah prinsip utama dalam pengobatan herbal.</p>'},{id:2,title:'7 Kesalahan Umum dalam Mengonsumsi Jamu',tag:'Tips',img:'https://picsum.photos/seed/jamu-tips/600/300.jpg',excerpt:'Hindari kesalahan ini agar khasiat jamu yang Anda minum benar-benar optimal.',date:'10 Juni 2026',readTime:'6 menit',content:'<p>Banyak orang mengonsumsi jamu secara sembarangan. Berikut kesalahan umum yang sering dilakukan:</p><h2>1. Air Terlalu Panas untuk Madu</h2><p>Madu kehilangan khasiatnya jika dilarutkan dalam air mendidih. Gunakan air hangat.</p>'},{id:3,title:'Tibbun Nabawi: Pengobatan Ala Nabi SAW',tag:'Tibbun Nabawi',img:'https://picsum.photos/seed/tibbun-nabawi/600/300.jpg',excerpt:'Memahami dasar-dasar pengobatan dalam sunnah Rasulullah SAW.',date:'8 Juni 2026',readTime:'10 menit',content:'<p>Tibbun Nabawi adalah ilmu pengobatan yang didasarkan pada hadis-hadis Nabi Muhammad SAW.</p><h2>Prinsip Dasar</h2><p>Setiap penyakit ada obatnya. Allah tidak menurunkan penyakit kecuali juga menurunkan obatnya.</p>'},{id:4,title:'Cara Menyimpan Herbal Agar Khasitnya Tidak Hilang',tag:'Penyimpanan',img:'https://picsum.photos/seed/herbal-store/600/300.jpg',excerpt:'Teknik penyimpanan yang benar menjaga kualitas herbal.',date:'5 Juni 2026',readTime:'5 menit',content:'<p>Penyimpanan yang salah dapat mengurangi khasiat herbal.</p><h2>Wadah Kedap Udara</h2><p>Gunakan wadah kaca atau keramik yang tertutup rapat.</p>'}],tips:[{icon:'fa-solid fa-lightbulb',bg:'var(--goldl)',color:'var(--goldd)',title:'Waktu Terbaik Minum Jamu',excerpt:'Minum ramuan herbal sebaiknya dilakukan di pagi hari sebelum sarapan.',aid:2},{icon:'fa-solid fa-mortar-pestle',bg:'var(--gl)',color:'var(--g2)',title:'Cara Menyimpan Herbal',excerpt:'Simpan herbal kering di wadah kedap udara, terhindar dari sinar matahari langsung.',aid:4},{icon:'fa-solid fa-triangle-exclamation',bg:'#fef2f2',color:'#ef4444',title:'Perhatian Dosis Herbal',excerpt:'Meski alami, herbal tetap perlu dosis yang tepat. Konsultasikan dengan ahli.',aid:2}],reminders:[{id:1,title:'Jamu Pagi',time:'07:00',herbs:['Habbatus Sauda','Madu','Jahe'],active:true},{id:2,title:'Vitamin Siang',time:'13:00',herbs:['Kurma','Kunyit'],active:true},{id:3,title:'Wedang Malam',time:'20:00',herbs:['Sereh','Jahe','Madu'],active:false}],notifs:[{icon:'fa-solid fa-seedling',bg:'var(--gl)',color:'var(--g2)',title:'Tanaman Baru',desc:'Saffron ditambahkan ke database',time:'2 jam lalu'},{icon:'fa-solid fa-bell',bg:'var(--goldl)',color:'var(--goldd)',title:'Waktunya Minum Jamu',desc:'Pengingat: Minum ramuan jahe madu Anda',time:'6 jam lalu'}],hero:{img:'https://z-cdn-media.chatglm.cn/files/d2219b20-cd77-4efb-91f4-405dd66c5616.png?auth_key=1881316527-6da3ea6469d14fbeac319359e2b0b99e-0-75a9d998ef1a6547e20069ff2a5aaafb',title:'Kehidupan Sehat dengan Herbal Alami',sub:'Temukan khasiat tanaman obat dan pengobatan ala Nabi SAW'},password:'admin123'};
+
+var D,favs=[],hist=[],syncStatus='local',prevPage='home';
+
+function load(){
+  try{
+    var s=localStorage.getItem('hpd5');
+    if(s){D=JSON.parse(s);if(!D.settings)D.settings={gasUrl:''}}
+    else D=JSON.parse(JSON.stringify(DEF));
+  }catch(e){D=JSON.parse(JSON.stringify(DEF))}
+  try{favs=JSON.parse(localStorage.getItem('hpf5')||'[]')}catch(e){favs=[]}
+  try{hist=JSON.parse(localStorage.getItem('hph5')||'[]')}catch(e){hist=[]}
+}
+
+function save(){
+  try{
+    localStorage.setItem('hpd5',JSON.stringify(D));
+    localStorage.setItem('hpf5',JSON.stringify(favs));
+    localStorage.setItem('hph5',JSON.stringify(hist));
+    syncStatus='saved_local';updateSyncUI();
+    if(D.settings&&D.settings.gasUrl)syncToCloud();
+  }catch(e){}
+}
+
+function updateSyncUI(){
+  var d=document.getElementById('syncDot'),t=document.getElementById('syncText');
+  if(!d||!t)return;
+  d.className='SYD';
+  if(syncStatus==='syncing'){d.classList.add('err');t.textContent='Menyinkronkan ke Cloud...'}
+  else if(syncStatus==='synced'){d.classList.add('on');t.textContent='Tersinkronisasi dengan Cloud'}
+  else if(syncStatus==='error'){d.classList.add('err');t.textContent='Gagal sinkronisasi'}
+  else t.textContent='Tersimpan Lokal'
+}
+
+async function syncToCloud(){
+  if(!D.settings||!D.settings.gasUrl)return;
+  syncStatus='syncing';updateSyncUI();
+  try{await fetch(D.settings.gasUrl,{method:'POST',body:JSON.stringify(D)});syncStatus='synced'}
+  catch(e){syncStatus='error'}updateSyncUI()
+}
+
+async function syncFromCloud(){
+  if(!D.settings||!D.settings.gasUrl)return;
+  syncStatus='syncing';updateSyncUI();
+  try{
+    var res=await fetch(D.settings.gasUrl+'?t='+Date.now());
+    var json=await res.json();
+    if(json.data){D=json.data;favs=[];hist=[];save();refreshAll();syncStatus='synced'}
+  }catch(e){syncStatus='error'}updateSyncUI();rAdm()
+}
+
+function toast(m){
+  var t=document.getElementById('tst');
+  t.textContent=m;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show')},2200)
+}
+
+function popOpen(id){document.getElementById(id).classList.add('on')}
+function popClose(id){document.getElementById(id).classList.remove('on')}
+
+function setNavVisible(v){
+  var nv=document.getElementById('mainNav');
+  nv.style.display=v?'flex':'none'
+}
+
+function go(pg){
+  if(pg!=='detail'&&pg!=='artdet'&&pg!=='notif'&&pg!=='filter'&&pg!=='login')prevPage=pg;
+  var all=document.querySelectorAll('.S');
+  for(var i=0;i<all.length;i++)all[i].classList.remove('show');
+  var el=document.getElementById('pg-'+pg);
+  if(el){el.classList.add('show');el.scrollTop=0}
+  var nbs=document.querySelectorAll('.NB');
+  for(var j=0;j<nbs.length;j++){
+    if(nbs[j].getAttribute('data-pg')===pg)nbs[j].classList.add('on');
+    else nbs[j].classList.remove('on')
+  }
+  var navPages=['home','categories','tibbun','profile'];
+  setNavVisible(navPages.indexOf(pg)>-1);
+  if(pg==='favorites')rFav();if(pg==='profile')uProf();
+  if(pg==='history')rHist();if(pg==='reminders')rRem();
+  if(pg==='tibbun')rTibPage();if(pg==='articles')rArt();
+  if(pg==='admin')rAdm();if(pg==='ad-plants')rAdPl();
+  if(pg==='ad-cats')rAdCa();if(pg==='ad-articles')rAdAr();
+  if(pg==='ad-hero')rAdHe();if(pg==='notif')rNotif();
+  if(pg==='filter')rFilter();if(pg==='login')rLogin();
+}
+
+function togFav(id,ev){
+  if(ev){ev.stopPropagation();ev.preventDefault()}
+  var i=favs.indexOf(id);
+  if(i===-1){favs.push(id);toast('Ditambahkan ke favorit')}
+  else{favs.splice(i,1);toast('Dihapus dari favorit')}
+  save();
+  document.querySelectorAll('[data-fvid="'+id+'"]').forEach(function(b){
+    var lk=favs.includes(id);b.classList.toggle('lk',lk);
+    b.innerHTML='<i class="fa-'+(lk?'solid':'regular')+' fa-heart"></i>'
+  });
+}
+
+function openDet(id){
+  var p=D.plants.find(function(x){return x.id===id});
+  if(!p)return;
+  hist=hist.filter(function(h){return h!==id});
+  hist.unshift(id);if(hist.length>20)hist.pop();save();
+  var isF=favs.includes(id);
+  var catN=D.cats.find(function(c){return c.id===p.category});
+  var bL=p.category==='tibbun'?'Tibbun Nabawi':(catN?catN.name:p.category);
+  var bC=p.category==='tibbun'?'var(--goldl)':'var(--gl)';
+  var bT=p.category==='tibbun'?'var(--goldd)':'var(--g2)';
+  var bI=p.category==='tibbun'?'mosque':'leaf';
+
+  var h='<div class="DET-PAGE"><div class="DET-HERO"><img src="'+p.img+'" alt="'+p.name+'"><div class="DET-GRAD"></div><button class="DET-BACK" onclick="go(\''+prevPage+'\')"><i class="fa-solid fa-arrow-left"></i></button><button class="DET-SHARE" onclick="toast(\'Tautan disalin\')"><i class="fa-solid fa-share-from-square"></i></button><div class="DET-INFO"><div class="DET-BADGE" style="background:'+bC+';color:'+bT+'"><i class="fa-solid fa-'+bI+'"></i> '+bL+'</div><h2 class="DET-NAME">'+p.name+'</h2><p class="DET-LATIN">'+p.latin+'</p></div></div><div class="DET-BODY"><div class="DET-INFO-GRID"><div><div class="dil">Famili</div><div class="div2">'+p.family+'</div></div><div><div class="dil">Bagian</div><div class="div2">'+p.partUsed+'</div></div><div><div class="dil">Cara</div><div class="div2">'+p.method+'</div></div></div><div class="DET-SEC"><h4><i class="fa-solid fa-book-open"></i> Deskripsi</h4><p>'+p.description+'</p></div><div class="DET-SEC"><h4><i class="fa-solid fa-star"></i> Manfaat</h4><div class="DET-BENEFITS">'+p.benefits.map(function(b){return'<div><i class="fa-solid fa-check-circle"></i><span>'+b+'</span></div>'}).join('')+'</div></div>';
+  if(p.hadith)h+='<div class="DET-SEC"><h4><i class="fa-solid fa-mosque"></i> Dalil</h4><div class="DET-HADITH"><div class="dhl"><i class="fa-solid fa-star-and-crescent"></i> Hadis / Al-Quran</div><p class="dha">'+p.hadith.arab+'</p><p class="dhtr">"'+p.hadith.translation+'"</p><div class="dhs">'+p.hadith.source+'</div></div></div>';
+  h+='<div class="DET-SEC"><h4><i class="fa-solid fa-mortar-pestle"></i> Resep</h4><div class="DET-RECIPE"><div class="drt2">'+p.recipe.title+'</div><div class="drst">'+p.recipe.steps.map(function(s,i){return'<div><div class="smn">'+(i+1)+'</div><div class="smt">'+s+'</div></div>'}).join('')+'</div></div>';
+  h+='<button class="DET-FAV-BTN '+(isF?'saved':'add')+'" id="detFavBtn" onclick="tdFav('+p.id+',this)"><i class="fa-solid fa-'+(isF?'check':'heart')+'"></i> '+(isF?'Tersimpan di Favorit':'Simpan ke Favorit')+'</button></div></div>';
+  document.getElementById('pg-detail').innerHTML=h;
+  go('detail');
+}
+
+function tdFav(id,b){
+  togFav(id);var f=favs.includes(id);
+  b.className='DET-FAV-BTN '+(f?'saved':'add');
+  b.innerHTML='<i class="fa-solid fa-'+(f?'check':'heart')+'"></i> '+(f?'Tersimpan di Favorit':'Simpan ke Favorit')
+}
+
+function doSearch(v){
+  var hc=document.getElementById('homeC'),sr=document.getElementById('srR');
+  var q=v.trim().toLowerCase();
+  if(!q){hc.style.display='';sr.style.display='none';sr.innerHTML='';return}
+  hc.style.display='none';sr.style.display='';
+  var r=D.plants.filter(function(p){
+    return p.name.toLowerCase().indexOf(q)>-1||p.latin.toLowerCase().indexOf(q)>-1||p.benefits.some(function(b){return b.toLowerCase().indexOf(q)>-1})||p.description.toLowerCase().indexOf(q)>-1
+  });
+  sr.innerHTML=r.length?r.map(function(p){
+    return'<div class="SRI" onclick="openDet('+p.id+')"><img src="'+p.img+'" alt="'+p.name+'"><div class="sri"><div class="srn">'+p.name+'</div><div class="srl">'+p.latin+'</div><span class="srt">'+p.category+'</span></div></div>'
+  }).join(''):'<div class="EMP"><i class="fa-solid fa-magnifying-glass"></i><h3>Tidak Ditemukan</h3><p>Coba kata kunci lain</p></div>'
+}
+
+function rHome(){
+  document.getElementById('heroImg').src=D.hero.img;
+  document.getElementById('heroTi').textContent=D.hero.title;
+  document.getElementById('heroSu').textContent=D.hero.sub;
+  var qCats=document.getElementById('qCats');
+  qCats.innerHTML=D.cats.slice(0,4).map(function(c){
+    return'<div class="CI4" onclick="go(\'categories\')"><div class="ic" style="background:'+c.color+'20;color:'+c.color+'"><i class="'+c.icon+'"></i></div><span>'+c.name+'</span></div>'
+  }).join('');
+  document.getElementById('st1').textContent=D.plants.length;
+  document.getElementById('st2').textContent=D.plants.filter(function(p){return p.category==='tibbun'}).length;
+  document.getElementById('st3').textContent=D.plants.reduce(function(a,p){return a+(p.recipe?1:0)},0);
+  document.getElementById('st4').textContent=D.plants.filter(function(p){return p.hadith}).length;
+  var popP=document.getElementById('popP');
+  popP.innerHTML=D.plants.slice(0,6).map(function(p){
+    return'<div class="PC" onclick="openDet('+p.id+')"><div class="PW"><img src="'+p.img+'" alt="'+p.name+'"><button class="FV'+(favs.includes(p.id)?' lk':'')+'" data-fvid="'+p.id+'" onclick="togFav('+p.id+',event)"><i class="fa-'+(favs.includes(p.id)?'solid':'regular')+' fa-heart"></i></button></div><div class="PB"><div class="PT">'+p.partUsed+'</div><div class="PN">'+p.name+'</div><div class="PL">'+p.latin+'</div></div></div>'
+  }).join('');
+  var tibC=document.getElementById('tibC');
+  tibC.innerHTML=D.plants.filter(function(p){return p.category==='tibbun'}).slice(0,3).map(function(p){
+    return'<div class="TCI" onclick="openDet('+p.id+')"><img src="'+p.img+'" alt="'+p.name+'"><div><div class="TN">'+p.name+'</div><div class="TD">'+(p.hadith?p.hadith.source:'Tanaman obat sunnah')+'</div></div></div>'
+  }).join('');
+  var tipL=document.getElementById('tipL');
+  tipL.innerHTML=D.tips.map(function(tp){
+    return'<div class="TPC" onclick="openArt('+tp.aid+')"><div class="TIC" style="background:'+tp.bg+';color:'+tp.color+'"><i class="'+tp.icon+'"></i></div><div class="TTX"><div class="TT2">'+tp.title+'</div><div class="TTE">'+tp.excerpt+'</div></div><i class="fa-solid fa-chevron-right" style="color:var(--g400)"></i></div>'
+  }).join('');
+}
+
+function rCat(){
+  var catG=document.getElementById('catG');
+  catG.innerHTML=D.cats.map(function(c){
+    var count=D.plants.filter(function(p){return p.category===c.id}).length;
+    return'<div class="CG2I" onclick="fCat(\''+c.id+'\')"><span class="ce" style="color:'+c.color+'"><i class="'+c.icon+'"></i></span><div class="cv">'+c.name+'</div><div class="cx">'+count+' tanaman</div></div>'
+  }).join('');
+  document.getElementById('cpT').textContent='Semua Tanaman';
+  fCat('all');
+}
+
+function fCat(cid){
+  document.getElementById('cpT').textContent=cid==='all'?'Semua Tanaman':(D.cats.find(function(c){return c.id===cid})||{}).name||'Kategori';
+  var list=cid==='all'?D.plants:D.plants.filter(function(p){return p.category===cid});
+  var apL=document.getElementById('apL');
+  apL.innerHTML=list.length?list.map(function(p){
+    var cn=D.cats.find(function(c){return c.id===p.category});
+    return'<div class="LI" onclick="openDet('+p.id+')"><img src="'+p.img+'" alt="'+p.name+'"><div class="LNF"><div class="LN">'+p.name+'</div><div class="LL">'+p.latin+'</div><span class="LC">'+ (p.category==='tibbun'?'Tibbun Nabawi':(cn?cn.name:p.category)) +'</span></div><i class="fa-solid fa-chevron-right" style="color:var(--g400)"></i></div>'
+  }).join(''):'<div class="EMP"><i class="fa-solid fa-leaf"></i><h3>Belum Ada Tanaman</h3><p>Tanaman di kategori ini akan muncul di sini</p></div>'
+}
+
+function rTibPage(){
+  var list=D.plants.filter(function(p){return p.category==='tibbun'});
+  var ct=document.getElementById('tibList');
+  ct.innerHTML=list.map(function(p){
+    return'<div class="TNP-card" onclick="openDet('+p.id+')"><img src="'+p.img+'" alt="'+p.name+'"><div class="TNC-info"><div class="TNC-name">'+p.name+'</div><div class="TNC-latin">'+p.latin+'</div><div class="TNC-ben">'+p.description.substring(0,100)+'...</div>'+(p.hadith?'<div class="TNC-had"><i class="fa-solid fa-mosque"></i> '+p.hadith.source+'</div>':'')+'</div></div>'
+  }).join('');
+}
+
+function rArt(){
+  var artL=document.getElementById('artL');
+  artL.innerHTML=D.articles.map(function(a){
+    return'<div class="ARC" onclick="openArt('+a.id+')"><img src="'+a.img+'" alt="'+a.title+'"><div class="atg">'+a.tag+'</div><div class="att">'+a.title+'</div><div class="atx">'+a.excerpt+'</div><div class="atm"><span><i class="fa-solid fa-calendar"></i> '+a.date+'</span><span><i class="fa-solid fa-clock"></i> '+a.readTime+'</span></div></div>'
+  }).join('');
+}
+
+function openArt(id){
+  var a=D.articles.find(function(x){return x.id===id});
+  if(!a)return;
+  var pg=document.getElementById('pg-artdet');
+  pg.innerHTML='<div class="HD"><button class="BKB" onclick="go(\'articles\')"><i class="fa-solid fa-arrow-left"></i> Kembali</button></div><div style="padding:20px"><div class="atg" style="font-size:11px;margin-bottom:8px;color:var(--g2);font-weight:700">'+a.tag+'</div><h2 style="font-size:22px;font-weight:900;color:var(--th);margin-bottom:12px">'+a.title+'</h2><div class="atm" style="margin-bottom:20px;font-size:11px"><span><i class="fa-solid fa-calendar"></i> '+a.date+'</span><span><i class="fa-solid fa-clock"></i> '+a.readTime+'</span></div><img src="'+a.img+'" style="width:100%;border-radius:14px;margin-bottom:20px" alt="'+a.title+'"><div style="font-size:14px;line-height:1.8;color:var(--tb)">'+a.content+'</div></div>';
+  go('artdet');
+}
+
+function rFav(){
+  var fc=document.getElementById('favC');
+  var fp=D.plants.filter(function(p){return favs.includes(p.id)});
+  fc.innerHTML=fp.length?fp.map(function(p){
+    return'<div class="LI" onclick="openDet('+p.id+')"><img src="'+p.img+'" alt="'+p.name+'"><div class="LNF"><div class="LN">'+p.name+'</div><div class="LL">'+p.latin+'</div></div><button class="FV lk" style="width:30px;height:30px;border-radius:50%;background:var(--g100);border:none;cursor:pointer;color:#ef4444" onclick="togFav('+p.id+',event)"><i class="fa-solid fa-heart"></i></button></div>'
+  }).join(''):'<div class="EMP"><i class="fa-solid fa-heart"></i><h3>Belum Ada Favorit</h3><p>Simpan tanaman obat favorit Anda</p></div>'
+}
+
+function rHist(){
+  var hl=document.getElementById('hisL');
+  var hp=D.plants.filter(function(p){return hist.includes(p.id)});
+  hl.innerHTML=hp.length?hp.map(function(p){
+    return'<div class="LI" onclick="openDet('+p.id+')"><img src="'+p.img+'" alt="'+p.name+'"><div class="LNF"><div class="LN">'+p.name+'</div><div class="LL">'+p.latin+'</div></div><i class="fa-solid fa-chevron-right" style="color:var(--g400)"></i></div>'
+  }).join(''):'<div class="EMP"><i class="fa-solid fa-clock"></i><h3>Belum Ada Riwayat</h3><p>Tanaman yang Anda baca akan muncul di sini</p></div>'
+}
+
+function rRem(){
+  var rl=document.getElementById('remL');
+  rl.innerHTML=D.reminders.map(function(r){
+    return'<div class="RMC"><div class="rhd"><div><div class="rnm">'+r.title+'</div><div class="rlb"><i class="fa-solid fa-clock"></i> '+r.time+'</div></div><button class="rtg'+(r.active?' on':'')+'" onclick="togRem('+r.id+')"></button></div><div class="rhb">'+r.herbs.map(function(h){return'<span>'+h+'</span>'}).join('')+'</div></div>'
+  }).join('');
+}
+
+function togRem(id){
+  var r=D.reminders.find(function(x){return x.id===id});if(r){r.active=!r.active;rRem();save()}
+}
+
+function uProf(){
+  document.getElementById('pFav').textContent=favs.length;
+  document.getElementById('pRead').textContent=hist.length;
+  var pmM=document.getElementById('pmM');
+  var menus=[
+    {icon:'fa-solid fa-heart',bg:'#fef2f2',color:'#ef4444',name:'Favorit Saya',desc:favs.length+' tanaman tersimpan',pg:'favorites'},
+    {icon:'fa-solid fa-clock',bg:'var(--gl)',color:'var(--g2)',name:'Riwayat Pembacaan',desc:hist.length+' tanaman terakhir',pg:'history'},
+    {icon:'fa-solid fa-bell',bg:'var(--goldl)',color:'var(--goldd)',name:'Pengingat Jamu',desc:'Atur jadwal minum herbal',pg:'reminders'},
+    {icon:'fa-solid fa-book',bg:'var(--gl)',color:'var(--g2)',name:'Artikel Kesehatan',desc:'Wawasan herbal & Tibbun Nabawi',pg:'articles'},
+    {icon:'fa-solid fa-gear',bg:'var(--g100)',color:'var(--g400)',name:'Tentang Aplikasi',desc:'Versi 5.0 - Herbalpedia',pg:'about'},
+    {icon:'fa-solid fa-share-nodes',bg:'var(--gl2)',color:'var(--g3)',name:'Bagikan Aplikasi',desc:'Ajak teman hidup sehat',pg:'share'},
+    {icon:'fa-solid fa-shield-halved',bg:'var(--g100)',color:'var(--g2)',name:'Dashboard Admin',desc:'Kelola data aplikasi',pg:'admin'}
+  ];
+  pmM.innerHTML=menus.map(function(m){
+    return'<div class="PMI" onclick="go(\''+m.pg+'\')"><div class="mic" style="background:'+m.bg+';color:'+m.color+'"><i class="'+m.icon+'"></i></div><div class="mtx"><div class="mn">'+m.name+'</div><div class="md">'+m.desc+'</div></div><i class="fa-solid fa-chevron-right" style="color:var(--g400)"></i></div>'
+  }).join('');
+}
+
+function rAdm(){
+  var adSt=document.getElementById('adSt');
+  adSt.innerHTML='<div><div class="av">'+D.plants.length+'</div><div class="al">Tanaman</div></div><div><div class="av">'+D.cats.length+'</div><div class="al">Kategori</div></div><div><div class="av">'+D.articles.length+'</div><div class="al">Artikel</div></div>';
+  var adMm=document.getElementById('adMm');
+  adMm.innerHTML='<div class="ADMI" onclick="go(\'ad-plants\')"><div class="aic" style="background:var(--gl);color:var(--g2)"><i class="fa-solid fa-seedling"></i></div><div class="atx"><div class="anm">Kelola Tanaman</div><div class="ade">'+D.plants.length+' data</div></div><i class="fa-solid fa-chevron-right" style="color:var(--g400)"></i></div><div class="ADMI" onclick="go(\'ad-cats\')"><div class="aic" style="background:var(--gl);color:var(--g2)"><i class="fa-solid fa-th-large"></i></div><div class="atx"><div class="anm">Kelola Kategori</div><div class="ade">'+D.cats.length+' kategori</div></div><i class="fa-solid fa-chevron-right" style="color:var(--g400)"></i></div><div class="ADMI" onclick="go(\'ad-articles\')"><div class="aic" style="background:var(--goldl);color:var(--goldd)"><i class="fa-solid fa-newspaper"></i></div><div class="atx"><div class="anm">Kelola Artikel</div><div class="ade">'+D.articles.length+' artikel</div></div><i class="fa-solid fa-chevron-right" style="color:var(--g400)"></i></div><div class="ADMI" onclick="go(\'ad-hero\')"><div class="aic" style="background:var(--gl2);color:var(--g3)"><i class="fa-solid fa-image"></i></div><div class="atx"><div class="anm">Ganti Banner Hero</div><div class="ade">Halaman utama</div></div><i class="fa-solid fa-chevron-right" style="color:var(--g400)"></i></div>';
+  var syncSec=document.getElementById('syncSec');
+  syncSec.innerHTML='<h4><i class="fa-solid fa-cloud"></i> Sinkronisasi Cloud</h4><div class="SYI"><label>URL Google Apps Script</label><input type="text" id="gasInp" placeholder="Paste URL Apps Script..." value="'+(D.settings.gasUrl||'')+'"></div><div class="SYB"><button class="syp" onclick="saveGas()">Simpan</button><button class="syg" onclick="syncFromCloud()">Ambil dari Cloud</button></div><div class="SYS"><span class="SYD" id="syncDot"></span><span id="syncText">Tersimpan Lokal</span></div>';
+  updateSyncUI();
+}
+
+function saveGas(){
+  var v=document.getElementById('gasInp').value.trim();
+  D.settings.gasUrl=v;save();toast('URL tersimpan!');syncToCloud()
+}
+
+function rAdPl(){
+  var c=document.getElementById('aplC');
+  c.innerHTML='<div class="ACRH"><h3>'+D.plants.length+' Tanaman</h3><button class="ABT" onclick="pfOpen()"><i class="fa-solid fa-plus"></i> Tambah</button></div>'+D.plants.map(function(p){
+    return'<div class="ARW"><img src="'+p.img+'" alt="'+p.name+'"><div class="ainf"><div class="anm">'+p.name+'</div><div class="asl">'+p.latin+'</div></div><div class="aac"><button class="EBT ed" onclick="pfOpen('+p.id+')"><i class="fa-solid fa-pen"></i></button><button class="EBT de" onclick="pdDel('+p.id+')"><i class="fa-solid fa-trash"></i></button></div></div>'
+  }).join('');
+}
+
+function pfOpen(id){
+  var p=id?D.plants.find(function(x){return x.id===id}):null;
+  var ftitle=p?'Edit Tanaman':'Tambah Tanaman';
+  var catsOpt=D.cats.map(function(c){return'<option value="'+c.id+'"'+(p&&p.category===c.id?' selected':'')+'>'+c.name+'</option>'}).join('');
+  var fHTML='<div class="PHD"><h3>'+ftitle+'</h3><button onclick="popClose(\'popForm\')"><i class="fa-solid fa-xmark"></i></button></div><div class="PBD"><div class="AFG"><label>Nama Tanaman</label><input type="text" id="fpName" value="'+(p?p.name:'')+'"></div><div class="AFG"><label>Nama Latin</label><input type="text" id="fpLatin" value="'+(p?p.latin:'')+'"></div><div class="AFG"><label>Kategori</label><select id="fpCat">'+catsOpt+'</select></div><div class="AFG"><label>URL Gambar</label><input type="text" id="fpImg" value="'+(p?p.img:'')+'"><img class="fpv" id="fpvImg" src="'+(p?p.img:'')+'"></div><div class="AFG"><label>Famili</label><input type="text" id="fpFam" value="'+(p?p.family:'')+'"></div><div class="AFG"><label>Bagian Digunakan</label><input type="text" id="fpPart" value="'+(p?p.partUsed:'')+'"></div><div class="AFG"><label>Cara Penggunaan</label><input type="text" id="fpMethod" value="'+(p?p.method:'')+'"></div><div class="AFG"><label>Deskripsi</label><textarea id="fpDesc">'+(p?p.description:'')+'</textarea></div><div class="AFG"><label>Manfaat (pisahkan dengan koma)</label><textarea id="fpBen">'+(p?p.benefits.join(', '):'')+'</textarea></div><div class="AFG"><label>Judul Resep</label><input type="text" id="fpRT" value="'+(p?p.recipe.title:'')+'"></div><div class="AFG"><label>Langkah Resep (pisahkan dengan |)</label><textarea id="fpRS">'+(p?p.recipe.steps.join('|'):'')+'</textarea></div><div class="AFBT"><button class="svb" onclick="pfSave('+(id||0)+')">'+(p?'Update':'Tambah')+'</button><button class="cnb" onclick="popClose(\'popForm\')">Batal</button></div></div>';
+  document.getElementById('formBx').innerHTML=fHTML;
+  document.getElementById('fpImg').addEventListener('input',function(){document.getElementById('fpvImg').src=this.value});
+  popOpen('popForm')
+}
+
+function pfSave(eid){
+  var name=document.getElementById('fpName').value.trim();
+  var latin=document.getElementById('fpLatin').value.trim();
+  if(!name){toast('Nama tanaman wajib diisi!');return}
+  var cat=document.getElementById('fpCat').value;
+  var img=document.getElementById('fpImg').value.trim();
+  var fam=document.getElementById('fpFam').value.trim();
+  var part=document.getElementById('fpPart').value.trim();
+  var method=document.getElementById('fpMethod').value.trim();
+  var desc=document.getElementById('fpDesc').value.trim();
+  var ben=document.getElementById('fpBen').value.split(',').map(function(s){return s.trim()}).filter(Boolean);
+  var rt=document.getElementById('fpRT').value.trim();
+  var rs=document.getElementById('fpRS').value.split('|').map(function(s){return s.trim()}).filter(Boolean);
+  var plant={
+    id:eid||(Math.max.apply(null,D.plants.map(function(p){return p.id}))+1),
+    name:name,latin:latin||'-',category:cat,img:img||'https://picsum.photos/seed/'+name.replace(/\s/g,'')+'/400/300.jpg',
+    family:fam||'-',partUsed:part||'-',method:method||'-',description:desc||'-',
+    benefits:ben.length?ben:['Belum ada data'],
+    recipe:{title:rt||'Resep '+name,steps:rs.length?rs:['Belum ada langkah']},
+    hadith:null
+  };
+  if(eid){var idx=D.plants.findIndex(function(p){return p.id===eid});if(idx>-1){plant.hadith=D.plants[idx].hadith;D.plants[idx]=plant}}
+  else D.plants.push(plant);
+  save();popClose('popForm');rAdPl();rHome();rCat();toast(eid?'Tanaman diupdate!':'Tanaman ditambahkan!')
+}
+
+function pdDel(id){
+  var p=D.plants.find(function(x){return x.id===id});
+  if(!p)return;
+  document.getElementById('confBx').innerHTML='<div class="CFMB"><i class="fa-solid fa-triangle-exclamation"></i><h3>Hapus "'+p.name+'"</h3><p>Tindakan ini tidak dapat dibatalkan. Tanaman akan dihapus permanen.</p><div class="cfb"><button class="cfy" onclick="pdDel2('+id+')">Ya, Hapus</button><button class="cfn" onclick="popClose(\'popConf\')">Batal</button></div></div>';
+  popOpen('popConf')
+}
+
+function pdDel2(id){
+  D.plants=D.plants.filter(function(p){return p.id!==id});
+  favs=favs.filter(function(f){return f!==id});hist=hist.filter(function(h){return h!==id});
+  save();popClose('popConf');rAdPl();rHome();toast('Tanaman dihapus')
+}
+
+function rAdCa(){
+  var c=document.getElementById('aclC');
+  c.innerHTML='<div class="ACRH"><h3>'+D.cats.length+' Kategori</h3><button class="ABT" onclick="cfOpen()"><i class="fa-solid fa-plus"></i> Tambah</button></div>'+D.cats.map(function(ct){
+    return'<div class="ARW" style="padding:12px;margin-bottom:6px"><div class="aic" style="width:36px;height:36px;border-radius:10px;font-size:14px;background:'+ct.color+'20;color:'+ct.color+'"><i class="'+ct.icon+'"></i></div><div class="ainf"><div class="anm">'+ct.name+'</div><div class="asl">ID: '+ct.id+'</div></div><div class="aac"><button class="EBT ed" onclick="cfOpen(\''+ct.id+'\')"><i class="fa-solid fa-pen"></i></button><button class="EBT de" onclick="cdDel(\''+ct.id+'\')"><i class="fa-solid fa-trash"></i></button></div></div>'
+  }).join('');
+}
+
+function cfOpen(cid){
+  var c=cid?D.cats.find(function(x){return x.id===cid}):null;
+  var ftitle=c?'Edit Kategori':'Tambah Kategori';
+  var h='<div class="PHD"><h3>'+ftitle+'</h3><button onclick="popClose(\'popForm\')"><i class="fa-solid fa-xmark"></i></button></div><div class="PBD"><div class="AFG"><label>ID Kategori</label><input type="text" id="fcId" value="'+(c?c.id:'')+'"'+(c?' disabled':'')+'></div><div class="AFG"><label>Nama Kategori</label><input type="text" id="fcName" value="'+(c?c.name:'')+'"></div><div class="AFG"><label>Icon (Font Awesome)</label><input type="text" id="fcIcon" value="'+(c?c.icon:'fa-solid fa-leaf')+'"></div><div class="AFG"><label>Warna</label><input type="text" id="fcColor" value="'+(c?c.color:'#1eb927')+'"></div><div class="AFBT"><button class="svb" onclick="cfSave(\''+(cid||'')+'\')">'+(c?'Update':'Tambah')+'</button><button class="cnb" onclick="popClose(\'popForm\')">Batal</button></div></div>';
+  document.getElementById('formBx').innerHTML=h;
+  popOpen('popForm')
+}
+
+function cfSave(oc){
+  var nid=document.getElementById('fcId').value.trim();
+  var nm=document.getElementById('fcName').value.trim();
+  if(!nid||!nm){toast('ID dan Nama wajib diisi!');return}
+  var newCat={id:nid,name:nm,icon:document.getElementById('fcIcon').value.trim(),color:document.getElementById('fcColor').value.trim()};
+  if(oc){var idx=D.cats.findIndex(function(c){return c.id===oc});if(idx>-1)D.cats[idx]=newCat}
+  else{if(D.cats.find(function(c){return c.id===nid})){toast('ID kategori sudah ada!');return}D.cats.push(newCat)}
+  save();popClose('popForm');rAdCa();rHome();toast(oc?'Kategori diupdate!':'Kategori ditambahkan!')
+}
+
+function cdDel(id){
+  document.getElementById('confBx').innerHTML='<div class="CFMB"><i class="fa-solid fa-triangle-exclamation"></i><h3>Hapus Kategori?</h3><p>Tanaman dalam kategori ini akan tetap ada. Lanjutkan?</p><div class="cfb"><button class="cfy" onclick="cdDel2(\''+id+'\')">Ya, Hapus</button><button class="cfn" onclick="popClose(\'popConf\')">Batal</button></div></div>';
+  popOpen('popConf')
+}
+
+function cdDel2(id){
+  D.cats=D.cats.filter(function(c){return c.id!==id});
+  save();popClose('popConf');rAdCa();rCat();toast('Kategori dihapus')
+}
+
+function rAdAr(){
+  var c=document.getElementById('aalC');
+  c.innerHTML='<div class="ACRH"><h3>'+D.articles.length+' Artikel</h3><button class="ABT" onclick="afOpen()"><i class="fa-solid fa-plus"></i> Tambah</button></div>'+D.articles.map(function(a){
+    return'<div class="ARW"><img src="'+a.img+'" style="width:48px;height:48px;border-radius:8px" alt="'+a.title+'"><div class="ainf"><div class="anm">'+a.title+'</div><div class="asl">'+a.date+' · '+a.readTime+'</div></div><div class="aac"><button class="EBT ed" onclick="afOpen('+a.id+')"><i class="fa-solid fa-pen"></i></button><button class="EBT de" onclick="adDel('+a.id+')"><i class="fa-solid fa-trash"></i></button></div></div>'
+  }).join('');
+}
+
+function afOpen(id){
+  var a=id?D.articles.find(function(x){return x.id===id}):null;
+  var ftitle=a?'Edit Artikel':'Tambah Artikel';
+  var h='<div class="PHD"><h3>'+ftitle+'</h3><button onclick="popClose(\'popForm\')"><i class="fa-solid fa-xmark"></i></button></div><div class="PBD"><div class="AFG"><label>Judul</label><input type="text" id="faTitle" value="'+(a?a.title:'')+'"></div><div class="AFG"><label>Tag</label><input type="text" id="faTag" value="'+(a?a.tag:'')+'"></div><div class="AFG"><label>URL Gambar</label><input type="text" id="faImg" value="'+(a?a.img:'')+'"></div><div class="AFG"><label>Kutipan</label><textarea id="faExc">'+(a?a.excerpt:'')+'</textarea></div><div class="AFG"><label>Konten HTML</label><textarea id="faCont" style="height:120px">'+(a?a.content:'')+'</textarea></div><div class="AFBT"><button class="svb" onclick="afSave('+(id||0)+')">'+(a?'Update':'Tambah')+'</button><button class="cnb" onclick="popClose(\'popForm\')">Batal</button></div></div>';
+  document.getElementById('formBx').innerHTML=h;
+  popOpen('popForm')
+}
+
+function afSave(eid){
+  var title=document.getElementById('faTitle').value.trim();
+  if(!title){toast('Judul wajib diisi!');return}
+  var art={
+    id:eid||(Math.max.apply(null,D.articles.map(function(a){return a.id}))+1),
+    title:title,tag:document.getElementById('faTag').value.trim()||'Umum',
+    img:document.getElementById('faImg').value.trim()||'https://picsum.photos/seed/'+title.replace(/\s/g,'')+'/600/300.jpg',
+    excerpt:document.getElementById('faExc').value.trim(),
+    date:new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}),
+    readTime:'5 menit',content:document.getElementById('faCont').value.trim()
+  };
+  if(eid){var idx=D.articles.findIndex(function(a){return a.id===eid});if(idx>-1){art.date=D.articles[idx].date;D.articles[idx]=art}}
+  else D.articles.push(art);
+  save();popClose('popForm');rAdAr();rArt();toast(eid?'Artikel diupdate!':'Artikel ditambahkan!')
+}
+
+function adDel(id){
+  var a=D.articles.find(function(x){return x.id===id});if(!a)return;
+  document.getElementById('confBx').innerHTML='<div class="CFMB"><i class="fa-solid fa-triangle-exclamation"></i><h3>Hapus "'+a.title+'"</h3><p>Tindakan ini tidak dapat dibatalkan.</p><div class="cfb"><button class="cfy" onclick="adDel2('+id+')">Ya, Hapus</button><button class="cfn" onclick="popClose(\'popConf\')">Batal</button></div></div>';
+  popOpen('popConf')
+}
+
+function adDel2(id){
+  D.articles=D.articles.filter(function(a){return a.id!==id});
+  save();popClose('popConf');rAdAr();toast('Artikel dihapus')
+}
+
+function rAdHe(){
+  var c=document.getElementById('ahlC');
+  c.innerHTML='<div class="AFG"><label>URL Gambar Hero</label><input type="text" id="fhImg" value="'+D.hero.img+'"><img class="fpv" id="fhvImg" src="'+D.hero.img+'"></div><div class="AFG"><label>Judul</label><input type="text" id="fhTitle" value="'+D.hero.title+'"></div><div class="AFG"><label>Subjudul</label><input type="text" id="fhSub" value="'+D.hero.sub+'"></div><button class="DFV" style="margin-top:16px;width:100%;padding:16px;border-radius:14px;background:var(--g1);color:var(--wh);border:none;cursor:pointer;font-size:14px;font-weight:700" onclick="saveHero()"><i class="fa-solid fa-check"></i> Simpan Banner</button>';
+  document.getElementById('fhImg').addEventListener('input',function(){document.getElementById('fhvImg').src=this.value});
+}
+
+function saveHero(){
+  D.hero.img=document.getElementById('fhImg').value.trim()||D.hero.img;
+  D.hero.title=document.getElementById('fhTitle').value.trim()||D.hero.title;
+  D.hero.sub=document.getElementById('fhSub').value.trim()||D.hero.sub;
+  save();rHome();toast('Banner hero disimpan!')
+}
+
+function rAbout(){
+  document.getElementById('abC').innerHTML='<div style="text-align:center;margin-bottom:30px"><div style="width:80px;height:80px;border-radius:20px;background:var(--g1);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--wh)"><i class="fa-solid fa-leaf"></i></div><h3 style="font-size:20px;font-weight:900;color:var(--g2)">Herbalpedia v5.0</h3><p style="color:var(--g400);margin-top:4px">Ensiklopedia Tanaman Obat</p></div><div style="color:var(--g500);font-size:13px;line-height:1.8;text-align:center"><p>Herbalpedia adalah aplikasi digital untuk mempelajari tanaman obat herbal Indonesia dan pengobatan Tibbun Nabawi berdasarkan Al-Quran dan Hadis Sahih.</p><p style="margin-top:16px">Dibuat dengan ❤️ untuk kesehatan umat.</p></div>'
+}
+
+function rShare(){
+  document.getElementById('shC').innerHTML='<div style="text-align:center"><div style="font-size:48px;color:var(--g1);margin-bottom:16px"><i class="fa-solid fa-share-nodes"></i></div><p style="color:var(--g500);font-size:14px;margin-bottom:24px">Bagikan Herbalpedia kepada teman dan keluarga untuk hidup lebih sehat dengan herbal alami.</p><div style="display:flex;gap:12px;justify-content:center"><button class="IB" style="width:50px;height:50px;border-radius:14px;background:var(--gl);cursor:pointer" onclick="toast(\'Tautan disalin\')"><i class="fa-solid fa-link"></i></button><span style="font-size:11px;color:var(--g400);align-self:center">Klik ikon untuk menyalin tautan</span></div></div>'
+}
+
+function rNotif(){
+  var nc=document.getElementById('notifContent');
+  nc.innerHTML=D.notifs.map(function(n){
+    return'<div style="display:flex;gap:12px;padding:14px;margin-bottom:8px;background:var(--wh);border-radius:12px;border:1px solid var(--g100)"><div style="width:40px;height:40px;border-radius:12px;background:'+n.bg+';display:flex;align-items:center;justify-content:center;color:'+n.color+';flex-shrink:0;font-size:16px"><i class="'+n.icon+'"></i></div><div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--th)">'+n.title+'</div><div style="font-size:12px;color:var(--g500);margin-top:2px">'+n.desc+'</div><div style="font-size:10px;color:var(--g400);margin-top:6px">'+n.time+'</div></div></div>'
+  }).join('');
+}
+
+function rFilter(){
+  var fc=document.getElementById('filterContent');
+  fc.innerHTML='<div class="SH" style="padding:0 0 16px"><h3>Pilih Kategori</h3></div>'+D.cats.map(function(c){
+    return'<div style="padding:14px;margin-bottom:8px;background:var(--gl2);border-radius:12px;cursor:pointer;border:1px solid var(--gs);transition:transform .15s" onclick="fCat(\''+c.id+'\');go(\'categories\')"><i class="'+c.icon+'" style="color:'+c.color+';margin-right:10px;font-size:16px"></i><span style="font-size:14px;font-weight:600;color:var(--th)">'+c.name+'</span></div>'
+  }).join('');
+}
+
+function rLogin(){
+  var lc=document.getElementById('loginContent');
+  lc.innerHTML='<div style="padding:10px 0"><p style="color:var(--g500);font-size:13px;margin-bottom:20px">Masukkan password untuk mengakses dashboard admin.</p><div class="AFG"><label>Password Admin</label><input type="password" id="lpPass" placeholder="Masukkan password..."></div><button class="DET-FAV-BTN add" onclick="checkLogin()" style="margin-top:10px"><i class="fa-solid fa-right-to-bracket"></i> Masuk</button></div>';
+}
+
+function checkLogin(){
+  var pass=document.getElementById('lpPass').value;
+  if(pass===D.password){go('admin');toast('Login berhasil!')}
+  else toast('Password salah!')
+}
+
+function refreshAll(){
+  rHome();rCat();rTibPage();rArt();rFav();uProf();
+}
+
+function init(){
+  load();
+  rHome();rCat();rTibPage();rArt();uProf();rRem();rAbout();rShare();
+
+  document.getElementById('sinp').addEventListener('input',function(){doSearch(this.value)});
+  document.getElementById('filtBtn').addEventListener('click',function(){go('filter')});
+  document.getElementById('notifBtn').addEventListener('click',function(){go('notif')});
+  document.getElementById('profBtn').addEventListener('click',function(){go('profile')});
+  document.getElementById('seeCat').addEventListener('click',function(){go('categories')});
+  document.getElementById('seePop').addEventListener('click',function(){go('categories')});
+  document.getElementById('seeTib').addEventListener('click',function(){go('tibbun')});
+  document.getElementById('addRemBtn').addEventListener('click',function(){
+    D.reminders.push({id:Date.now(),title:'Pengingat Baru',time:'08:00',herbs:['Madu','Jahe'],active:true});
+    save();rRem();toast('Pengingat ditambahkan!')
+  });
+
+  document.querySelectorAll('.NB').forEach(function(b){
+    b.addEventListener('click',function(){go(this.getAttribute('data-pg'))})
+  });
+
+  document.querySelectorAll('.POP').forEach(function(p){
+    p.addEventListener('click',function(e){if(e.target===p)popClose(p.id)})
+  });
+
+  var profBtn=document.getElementById('profBtn');
+  profBtn.addEventListener('contextmenu',function(e){e.preventDefault();go('login')});
+  profBtn.addEventListener('dblclick',function(){go('login')});
+}
+
+window.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
