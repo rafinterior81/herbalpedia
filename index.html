@@ -158,7 +158,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e5e7eb;color:var(--t
 .PMI .mn{font-size:14px;font-weight:600;color:var(--th)}
 .PMI .md{font-size:11px;color:var(--g400)}
 
-/* ===== DETAIL PAGE (FULL PAGE) ===== */
 .DET-PAGE{position:relative;width:100%;background:var(--wh)}
 .DET-HERO{position:relative;height:280px;overflow:hidden;background:linear-gradient(135deg,var(--g2),var(--g1))}
 .DET-HERO img{width:100%;height:100%;object-fit:cover;display:block;opacity:.9}
@@ -313,10 +312,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e5e7eb;color:var(--t
 
 <div class="S has-nav" id="pg-articles"><div class="HD"><h2>Artikel Kesehatan</h2><p>Wawasan seputar herbal dan Tibbun Nabawi</p></div><div id="artL" style="padding-top:16px"></div></div>
 
-<!-- DETAIL PLANT - FULL PAGE -->
 <div class="S no-nav" id="pg-detail"></div>
-
-<!-- DETAIL ARTIKEL - FULL PAGE -->
 <div class="S no-nav" id="pg-artdet"></div>
 
 <div class="S has-nav" id="pg-favorites"><div class="HD"><h2>Favorit Saya</h2><p>Koleksi tanaman obat yang Anda simpan</p></div><div id="favC"></div></div>
@@ -326,13 +322,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e5e7eb;color:var(--t
 <div class="S has-nav" id="pg-share"><div class="HD"><h2>Bagikan Aplikasi</h2><p>Ajak teman hidup sehat</p></div><div id="shC" style="padding:30px 20px"></div></div>
 <div class="S has-nav" id="pg-profile"><div class="PFH"><div class="pav"><i class="fa-solid fa-user"></i></div><h3>Pengguna Herbalpedia</h3><p>Pencinta herbal alami</p></div><div class="PST"><div><div class="pv" id="pFav">0</div><div class="pk">Favorit</div></div><div><div class="pv" id="pRead">0</div><div class="pk">Dibaca</div></div><div><div class="pv">7</div><div class="pk">Hari</div></div></div><div class="PM" id="pmM"></div></div>
 
-<!-- NOTIFIKASI - FULL PAGE -->
 <div class="S no-nav" id="pg-notif"><div class="HD"><h2><i class="fa-solid fa-bell"></i> Notifikasi</h2><button class="BKB" onclick="go('home')" style="position:absolute;top:20px;right:20px"><i class="fa-solid fa-arrow-left"></i></button></div><div id="notifContent" style="padding:16px 20px"></div></div>
 
-<!-- FILTER - FULL PAGE -->
 <div class="S no-nav" id="pg-filter"><div class="HD"><h2><i class="fa-solid fa-sliders"></i> Filter Kategori</h2><button class="BKB" onclick="go('home')" style="position:absolute;top:20px;right:20px"><i class="fa-solid fa-arrow-left"></i></button></div><div id="filterContent" style="padding:16px 20px"></div></div>
 
-<!-- LOGIN - FULL PAGE -->
 <div class="S no-nav" id="pg-login"><div class="HD"><h2><i class="fa-solid fa-lock"></i> Login Admin</h2><button class="BKB" onclick="go('profile')" style="position:absolute;top:20px;right:20px"><i class="fa-solid fa-arrow-left"></i></button></div><div id="loginContent" style="padding:20px"></div></div>
 
 <div class="S no-nav" id="pg-admin"><div class="ADMH"><h2><i class="fa-solid fa-shield-halved" style="margin-right:8px"></i>Dashboard Admin</h2><p>Kelola semua data aplikasi</p></div><div class="ADST" id="adSt"></div><div class="ADMM" id="adMm"></div><div class="SYNC" id="syncSec"></div></div>
@@ -343,7 +336,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e5e7eb;color:var(--t
 
 <nav class="NV" id="mainNav"><button class="NB on" data-pg="home"><i class="fa-solid fa-house"></i><span>Beranda</span></button><button class="NB" data-pg="categories"><i class="fa-solid fa-th-large"></i><span>Kategori</span></button><button class="NB" data-pg="tibbun"><i class="fa-solid fa-mosque"></i><span>Tibbun</span></button><button class="NB" data-pg="profile"><i class="fa-solid fa-user"></i><span>Profil</span></button></nav>
 
-<!-- Popup hanya untuk form dan konfirmasi -->
 <div class="POP ADM" id="popForm"><div class="PBOX" id="formBx"></div></div>
 <div class="POP" id="popConf"><div class="PBOX" style="max-width:320px" id="confBx"></div></div>
 <div class="TST" id="tst"></div>
@@ -355,7 +347,10 @@ var DEF={settings:{gasUrl:DEFAULT_GAS_URL},cats:[{id:'rematik',name:'Rematik & S
 
 var D,favs=[],hist=[],syncStatus='local',prevPage='home';
 var autoSaveInterval = null;
+var autoPollInterval = null;
 var GAS_URL = DEFAULT_GAS_URL;
+var lastCloudHash = null;
+var isPolling = false;
 
 function load(){
   try{
@@ -366,6 +361,14 @@ function load(){
   try{favs=JSON.parse(localStorage.getItem('hpf5')||'[]')}catch(e){favs=[]}
   try{hist=JSON.parse(localStorage.getItem('hph5')||'[]')}catch(e){hist=[]}
   GAS_URL = (D.settings && D.settings.gasUrl) ? D.settings.gasUrl : DEFAULT_GAS_URL;
+  lastCloudHash = getDataHash();
+}
+
+function getDataHash(){
+  var hashStr = JSON.stringify(D.plants)+'|'+JSON.stringify(D.cats)+'|'+JSON.stringify(D.articles)+'|'+JSON.stringify(D.hero);
+  var hash = 0;
+  for(var i=0;i<hashStr.length;i++){hash=((hash<<5)-hash)+hashStr.charCodeAt(i);hash|=0}
+  return hash;
 }
 
 function save(){
@@ -382,15 +385,16 @@ async function pushToCloud(){
   if(!GAS_URL) return;
   syncStatus='syncing';updateSyncUI();
   try{
-    var payload = {action:'save',data:D};
-    var res = await fetch(GAS_URL, {
+    var payload = JSON.stringify({action:'save',data:D,plants:D.plants,cats:D.cats,articles:D.articles,hero:D.hero});
+    await fetch(GAS_URL, {
       method:'POST',
       mode:'no-cors',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload)
+      headers:{'Content-Type':'text/plain'},
+      body:payload
     });
     syncStatus='synced';updateSyncUI();
-    toast('Data tersimpan otomatis di cloud');
+    lastCloudHash = getDataHash();
+    if(document.getElementById('syncDot')) toast('Data tersimpan & dishare ke cloud');
   }catch(e){
     syncStatus='error';updateSyncUI();
     console.log('Cloud push failed:',e);
@@ -398,12 +402,48 @@ async function pushToCloud(){
 }
 
 async function pullFromCloud(){
-  if(!GAS_URL) return;
-  syncStatus='syncing';updateSyncUI();
+  if(!GAS_URL || isPolling) return;
+  isPolling = true;
   try{
-    var res = await fetch(GAS_URL+'?action=load&t='+Date.now(), {mode:'no-cors'});
+    var res = await fetch(GAS_URL+'?action=load&t='+Date.now());
+    var text = await res.text();
+    try{
+      var cloud = JSON.parse(text);
+      if(cloud && cloud.plants && cloud.cats){
+        var cloudHash = getCloudHash(cloud);
+        if(cloudHash !== lastCloudHash){
+          D.plants = cloud.plants;
+          D.cats = cloud.cats;
+          if(cloud.articles) D.articles = cloud.articles;
+          if(cloud.hero) D.hero = cloud.hero;
+          lastCloudHash = cloudHash;
+          saveLocalOnly();
+          refreshAll();
+          if(document.getElementById('syncDot')) toast('Data diperbarui dari cloud!');
+          console.log('Cloud update applied to UI');
+        }
+      }
+    }catch(e){console.log('Parse cloud data failed')}
     syncStatus='synced';updateSyncUI();
-  }catch(e){syncStatus='error';updateSyncUI();console.log('Cloud pull failed:',e)}
+  }catch(e){
+    console.log('Cloud pull failed:',e);
+  }
+  isPolling = false;
+}
+
+function getCloudHash(cloud){
+  var hashStr = JSON.stringify(cloud.plants)+'|'+JSON.stringify(cloud.cats)+'|'+JSON.stringify(cloud.articles||[])+'|'+JSON.stringify(cloud.hero||{});
+  var hash = 0;
+  for(var i=0;i<hashStr.length;i++){hash=((hash<<5)-hash)+hashStr.charCodeAt(i);hash|=0}
+  return hash;
+}
+
+function saveLocalOnly(){
+  try{
+    localStorage.setItem('hpd5',JSON.stringify(D));
+    localStorage.setItem('hpf5',JSON.stringify(favs));
+    localStorage.setItem('hph5',JSON.stringify(hist));
+  }catch(e){}
 }
 
 function updateSyncUI(){
@@ -411,7 +451,7 @@ function updateSyncUI(){
   if(!d||!t)return;
   d.className='SYD';
   if(syncStatus==='syncing'){d.classList.add('err');t.textContent='Menyinkronkan ke Cloud...'}
-  else if(syncStatus==='synced'){d.classList.add('on');t.textContent='Tersinkronisasi dengan Cloud'}
+  else if(syncStatus==='synced'){d.classList.add('on');t.textContent='Tersinkronisasi - Live'}
   else if(syncStatus==='error'){d.classList.add('err');t.textContent='Gagal sinkronisasi'}
   else t.textContent='Tersimpan Lokal'
 }
@@ -421,11 +461,13 @@ async function syncFromCloud(){
   toast('Mengambil data dari cloud...');
   syncStatus='syncing';updateSyncUI();
   try{
-    var res=await fetch(GAS_URL+'?action=load&t='+Date.now(),{mode:'no-cors'});
-    syncStatus='synced';updateSyncUI();
-    toast('Sinkronisasi selesai');
+    var res=await fetch(GAS_URL+'?action=load&t='+Date.now());
+    var text=await res.text();
+    try{
+      var cloud=JSON.parse(text);
+      if(cloud&&cloud.plants){D.plants=cloud.plants;D.cats=cloud.cats;if(cloud.articles)D.articles=cloud.articles;if(cloud.hero)D.hero=cloud.hero;lastCloudHash=getCloudHash(cloud);save();refreshAll();rAdm();toast('Sinkronisasi selesai - Data terbaru!')}
+    }catch(e){toast('Data cloud tidak valid')}
   }catch(e){syncStatus='error';updateSyncUI()}
-  refreshAll();rAdm();
 }
 
 function toast(m){
@@ -635,7 +677,7 @@ function rAdm(){
   var adMm=document.getElementById('adMm');
   adMm.innerHTML='<div class="ADMI" onclick="go(\'ad-plants\')"><div class="aic" style="background:var(--gl);color:var(--g2)"><i class="fa-solid fa-seedling"></i></div><div class="atx"><div class="anm">Kelola Tanaman</div><div class="ade">'+D.plants.length+' data</div></div><i class="fa-solid fa-chevron-right" style="color:var(--g400)"></i></div><div class="ADMI" onclick="go(\'ad-cats\')"><div class="aic" style="background:var(--gl);color:var(--g2)"><i class="fa-solid fa-th-large"></i></div><div class="atx"><div class="anm">Kelola Kategori</div><div class="ade">'+D.cats.length+' kategori</div></div><i class="fa-solid fa-chevron-right" style="color:var(--g400)"></i></div><div class="ADMI" onclick="go(\'ad-articles\')"><div class="aic" style="background:var(--goldl);color:var(--goldd)"><i class="fa-solid fa-newspaper"></i></div><div class="atx"><div class="anm">Kelola Artikel</div><div class="ade">'+D.articles.length+' artikel</div></div><i class="fa-solid fa-chevron-right" style="color:var(--g400)"></i></div><div class="ADMI" onclick="go(\'ad-hero\')"><div class="aic" style="background:var(--gl2);color:var(--g3)"><i class="fa-solid fa-image"></i></div><div class="atx"><div class="anm">Ganti Banner Hero</div><div class="ade">Halaman utama</div></div><i class="fa-solid fa-chevron-right" style="color:var(--g400)"></i></div>';
   var syncSec=document.getElementById('syncSec');
-  syncSec.innerHTML='<h4><i class="fa-solid fa-cloud"></i> Sinkronisasi Cloud</h4><div class="SYI"><label>URL Google Apps Script</label><input type="text" id="gasInp" placeholder="Paste URL Apps Script..." value="'+GAS_URL+'"></div><div class="SYB"><button class="syp" onclick="saveGas()">Simpan URL</button><button class="syg" onclick="syncFromCloud()">Ambil dari Cloud</button></div><div class="SYS"><span class="SYD" id="syncDot"></span><span id="syncText">Tersimpan Lokal</span></div><p style="font-size:10px;color:var(--g400);margin-top:12px"><i class="fa-solid fa-info-circle"></i> Data otomatis tersimpan setiap 30 detik dan setiap kali ada perubahan</p>';
+  syncSec.innerHTML='<h4><i class="fa-solid fa-cloud"></i> Sinkronisasi Cloud - Real-time</h4><div class="SYI"><label>URL Google Apps Script</label><input type="text" id="gasInp" placeholder="Paste URL Apps Script..." value="'+GAS_URL+'"></div><div class="SYB"><button class="syp" onclick="saveGas()">Simpan URL</button><button class="syg" onclick="syncFromCloud()">Ambil dari Cloud</button></div><div class="SYS"><span class="SYD" id="syncDot"></span><span id="syncText">Tersimpan Lokal</span></div><p style="font-size:10px;color:var(--g400);margin-top:12px"><i class="fa-solid fa-info-circle"></i> Data otomatis tersimpan setiap 30 detik & dicek update setiap 5 detik. Update dari HP lain akan otomatis tampil.</p>';
   updateSyncUI();
 }
 
@@ -645,7 +687,7 @@ function saveGas(){
   GAS_URL = v;
   D.settings.gasUrl=v;
   save();
-  toast('URL cloud tersimpan! Sinkronisasi dimulai...');
+  toast('URL cloud tersimpan! Sinkronisasi real-time dimulai...');
   pushToCloud();
 }
 
@@ -689,7 +731,7 @@ function pfSave(eid){
   };
   if(eid){var idx=D.plants.findIndex(function(p){return p.id===eid});if(idx>-1){plant.hadith=D.plants[idx].hadith;D.plants[idx]=plant}}
   else D.plants.push(plant);
-  save();popClose('popForm');rAdPl();rHome();rCat();toast(eid?'Tanaman diupdate!':'Tanaman ditambahkan!')
+  save();popClose('popForm');rAdPl();rHome();rCat();toast(eid?'Tanaman diupdate! Perubahan akan muncul di HP lain':'Tanaman ditambahkan! Akan muncul di HP lain')
 }
 
 function pdDel(id){
@@ -702,7 +744,7 @@ function pdDel(id){
 function pdDel2(id){
   D.plants=D.plants.filter(function(p){return p.id!==id});
   favs=favs.filter(function(f){return f!==id});hist=hist.filter(function(h){return h!==id});
-  save();popClose('popConf');rAdPl();rHome();toast('Tanaman dihapus')
+  save();popClose('popConf');rAdPl();rHome();toast('Tanaman dihapus - Perubahan ke cloud')
 }
 
 function rAdCa(){
@@ -865,6 +907,12 @@ function init(){
   autoSaveInterval = setInterval(function(){
     save();
   }, 30000);
+
+  // Auto-polling dari cloud setiap 5 detik untuk update real-time
+  if(autoPollInterval) clearInterval(autoPollInterval);
+  autoPollInterval = setInterval(function(){
+    pullFromCloud();
+  }, 5000);
 
   // Tarik data dari cloud saat pertama kali
   if(GAS_URL) pullFromCloud();
