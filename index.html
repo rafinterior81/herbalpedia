@@ -831,5 +831,39 @@ function init(){
 
 window.addEventListener('DOMContentLoaded',init);
 </script>
+
+
+<div id="daftar-herbal"></div>
+
+<script>
+  // Fungsi untuk mengambil data terbaru dari data.json
+  async function muatDataHerbal() {
+    try {
+      const respon = await fetch('data.json');
+      const daftarTanaman = await respon.json();
+      
+      const kontainer = document.getElementById('daftar-herbal');
+      kontainer.innerHTML = ''; // Kosongkan data lama
+
+      // Looping dan tampilkan data terbaru ke layar
+      daftarTanaman.forEach(tanaman => {
+        kontainer.innerHTML += `
+          <div class="herbal-card">
+            <h3>${tanaman.nama}</h3>
+            <p><i>${tanaman.namaIlmiah}</i> - ${tanaman.kategori}</p>
+          </div>
+        `;
+      });
+    } catch (error) {
+      console.error("Gagal memuat data:", error);
+    }
+  }
+
+  // Jalankan fungsi saat halaman pertama kali dibuka
+  muatDataHerbal();
+</script>
+
+
+  
 </body>
 </html>
