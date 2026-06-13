@@ -383,21 +383,23 @@ function save(){
 
 async function pushToCloud(){
   if(!GAS_URL) return;
-  syncStatus='syncing';updateSyncUI();
+  syncStatus='syncing'; updateSyncUI();
   try{
     var payload = JSON.stringify({action:'save',data:D,plants:D.plants,cats:D.cats,articles:D.articles,hero:D.hero});
+    
+    // HAPUS mode: 'no-cors' agar header text/plain benar-benar terkirim
     await fetch(GAS_URL, {
-      method:'POST',
-      mode:'no-cors',
-      headers:{'Content-Type':'text/plain'},
-      body:payload
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' }, 
+      body: payload
     });
-    syncStatus='synced';updateSyncUI();
+    
+    syncStatus='synced'; updateSyncUI();
     lastCloudHash = getDataHash();
     if(document.getElementById('syncDot')) toast('Data tersimpan & dishare ke cloud');
   }catch(e){
-    syncStatus='error';updateSyncUI();
-    console.log('Cloud push failed:',e);
+    syncStatus='error'; updateSyncUI();
+    console.log('Cloud push failed:', e);
   }
 }
 
