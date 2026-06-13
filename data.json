@@ -1,0 +1,14 @@
+[
+  {
+    "id": "1",
+    "nama": "Jahe Merah",
+    "namaIlmiah": "Zingiber officinale var. rubrum",
+    "kategori": "Rimpang"
+  },
+  {
+    "id": "2",
+    "nama": "Daun Kelor",
+    "namaIlmiah": "Moringa oleifera",
+    "kategori": "Daun"
+  }
+]
